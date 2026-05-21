@@ -15,6 +15,10 @@ return new class extends Migration
     $table->id();
 
     $table->string('full_name');
+    $table->foreignId('user_id')
+          ->constrained()
+          ->cascadeOnDelete();
+
     $table->string('academic_number')->unique();
 
     $table->foreignId('specialization_id')

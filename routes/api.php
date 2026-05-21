@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\StudentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -43,3 +45,5 @@ Route::middleware(['auth:sanctum', 'role:committee_head'])
             'message' => 'Access Granted 🎉'
         ]);
     });
+
+Route::apiResource('students', StudentController::class);
