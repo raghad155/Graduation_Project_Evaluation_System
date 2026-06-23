@@ -48,7 +48,7 @@ class User extends Authenticatable
     return $this->belongsToMany(Role::class);
 }
 
-public function projects()
+public function supervisedProjects()
 {
     return $this->hasMany(Project::class, 'supervisor_id');
 }
