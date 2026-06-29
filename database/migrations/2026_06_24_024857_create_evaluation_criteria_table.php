@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('evaluation_criteria', function (Blueprint $table) {
             $table->id();
 
+            
+            $table->foreignId('project_id')
+                  ->constrained()
+                  ->onDelete('cascade');
+
             $table->string('name'); // اسم المعيار
 
             $table->text('description')->nullable(); // وصف المعيار
@@ -21,6 +26,7 @@ return new class extends Migration
             $table->integer('weight'); // الوزن النسبي
 
             $table->timestamps();
+
         });
     }
 

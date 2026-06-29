@@ -101,3 +101,8 @@ Route::get(
 '/evaluations/{id}/final-score',
 [EvaluationController::class,'calculateFinalScore']
 );
+ Route::post('/evaluation-scores', [EvaluationController::class, 'storeScores']);
+
+Route::get('/evaluations/{evaluation}/students/{student}/final-score',
+    [EvaluationController::class, 'finalScore']
+);

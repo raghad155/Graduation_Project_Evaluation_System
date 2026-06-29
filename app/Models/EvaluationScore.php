@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class EvaluationScore extends Model
 {
-    protected $fillable=[
-        'evaluation_id',
-        'criteria_id',
-        'score'
-    ];
+ protected $fillable = [
+
+    'evaluation_id',
+    'student_id',
+    'criteria_id',
+    'score'
+
+ ];
 
     protected $table='evaluation_scores';
 

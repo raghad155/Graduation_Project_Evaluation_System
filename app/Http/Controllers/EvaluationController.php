@@ -85,41 +85,52 @@ public function storeScores(Request $request)
 
         'evaluation_id'=>'required|exists:evaluations,id',
 
-        'scores'=>'required|array'
+        'student_id'=>'required|exists:students,id',
 
+        'scores'=>'required|array'
     ]);
 
-    foreach($request->scores as $score){
+    foreach($request->scores as $item){
 
         EvaluationScore::create([
 
             'evaluation_id'=>$request->evaluation_id,
 
-            'criteria_id'=>$score['criteria_id'],
+            'student_id'=>$request->student_id,
 
-            'score'=>$score['score']
+            'criteria_id'=>$item['criteria_id'],
+
+            'score'=>$item['score']
+
         ]);
+
     }
 
     return response()->json([
-
         'message'=>'Scores saved successfully'
-
     ]);
 }
-public function calculateFinalScore($evaluation_id)
+public function finalScore($evaluation_id, $student_id)
 {
-    $evaluation = Evaluation::with('scores')->findOrFail($evaluation_id);
+    $evaluation = Evaluation::with(['scores.criteria'])
+        ->findOrFail($evaluation_id);
 
     $total = 0;
 
     foreach ($evaluation->scores as $score) {
-        $total += $score->score;
+
+        if ($score->student_id != $student_id) {
+            continue;
+        }
+
+        $weight = $score->criteria->weight;
+
+        $total += ($score->score * $weight) / 100;
     }
 
     return response()->json([
-        'evaluation_id' => $evaluation->id,
-        'final_score' => $total
+        'evaluation_id' => $evaluation_id,
+        'student_id' => $student_id,
+        'final_score' => round($total, 2)
     ]);
-}
-}
+}}
