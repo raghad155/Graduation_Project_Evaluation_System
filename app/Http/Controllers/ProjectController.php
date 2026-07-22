@@ -7,17 +7,37 @@ use App\Models\Project;
 use App\Models\Specialization;
 use App\Models\User;
 use App\Models\Student;
-
+use App\Models\AuditLog;
+use App\Imports\ProjectsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
 {
     public function index()
-{
-    return Project::with([
-        'supervisor',
-        'specialization'
-    ])->get();
-}
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([], 401);
+        }
+
+        $query = Project::with([
+            'supervisor',
+            'specialization',
+            'committee'
+        ]);
+
+        // Admins can see everything. Non-admins only see their relevant projects.
+        if (!$user->roles()->where('name', 'admin')->exists()) {
+            $committeeIds = \DB::table('committee_user')->where('user_id', $user->id)->pluck('committee_id');
+            
+            $query->where(function ($q) use ($user, $committeeIds) {
+                $q->where('supervisor_id', $user->id)
+                  ->orWhereIn('committee_id', $committeeIds);
+            });
+        }
+
+        return $query->get();
+    }
 public function store(Request $request)
 {
     $request->validate([
@@ -26,6 +46,7 @@ public function store(Request $request)
         'academic_year' => 'nullable|string',
         'specialization_id' => 'required|exists:specializations,id',
         'supervisor_id' => 'nullable|exists:users,id',
+        'committee_id' => 'nullable|exists:committees,id',
     ]);
 
     $project = Project::create([
@@ -33,6 +54,7 @@ public function store(Request $request)
         'description' => $request->description,
         'specialization_id' => $request->specialization_id,
         'supervisor_id' => $request->supervisor_id,
+        'committee_id' => $request->committee_id,
     ]);
 
     return response()->json([
@@ -44,7 +66,8 @@ public function show($id)
 {
     return Project::with([
         'supervisor',
-        'specialization'
+        'specialization',
+        'committee'
     ])->findOrFail($id);
 }
 public function update(Request $request, $id)
@@ -57,6 +80,7 @@ public function update(Request $request, $id)
         'academic_year' => 'nullable|string',
         'specialization_id' => 'required|exists:specializations,id',
         'supervisor_id' => 'nullable|exists:users,id',
+        'committee_id' => 'nullable|exists:committees,id',
     ]);
 
     $project->update([
@@ -65,6 +89,7 @@ public function update(Request $request, $id)
         'academic_year' => $request->academic_year,
         'specialization_id' => $request->specialization_id,
         'supervisor_id' => $request->supervisor_id,
+        'committee_id' => $request->committee_id,
     ]);
 
     return response()->json([
@@ -122,12 +147,60 @@ if ($project->students()->count() >= $project->max_students) {
         'project_id' => $project->id
     ]);
 }
-public function getStudents(Project $project)
-{
-    return response()->json(
-        $project->students
-    );
-}
+    public function getStudents(Project $project)
+    {
+        return response()->json($project->students);
+    }
+
+    public function toggleLock(Request $request, Project $project)
+    {
+        // إذا كان مقفلاً، فقط رئيس اللجنة يمكنه فك הקفل (Unlock).
+        // إذا كان غير مقفل، يمكن لأي شخص مصرح دخوله أن يقفله (Lock).
+        if ($project->is_locked && !auth()->user()->hasRole('committee_head')) {
+            return response()->json([
+                'message' => 'فك اعتماد التقييم متاح لرئيس اللجنة فقط.'
+            ], 403);
+        }
+
+        $project->is_locked = !$project->is_locked;
+        $project->save();
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => $project->is_locked ? 'PROJECT_LOCKED' : 'PROJECT_UNLOCKED',
+            'details' => "Project ID {$project->id} status changed to " . ($project->is_locked ? "Locked" : "Unlocked"),
+            'ip_address' => request()->ip()
+        ]);
+
+        return response()->json([
+            'message' => 'تم تغيير حالة الاعتماد بنجاح.',
+            'is_locked' => $project->is_locked
+        ]);
+    }
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            $beforeCount = Project::count();
+            Excel::import(new ProjectsImport, $request->file('file'));
+            $afterCount = Project::count();
+
+            return response()->json([
+                'message' => 'Projects imported successfully.',
+                'imported' => $afterCount - $beforeCount,
+            ], 200);
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Projects Import Exception: " . $e->getMessage());
+            return response()->json([
+                'errors' => [$e->getMessage()]
+            ], 500);
+        }
+    }
  
 public function changeStudent(Request $request, Project $project)
 {

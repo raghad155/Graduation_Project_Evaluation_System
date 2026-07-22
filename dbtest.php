@@ -1,0 +1,1 @@
+<?php $mysqli = new mysqli('127.0.0.1', 'root', '', 'project_evaluation_system_db'); echo json_encode(['groups' => $mysqli->query('SELECT * FROM evaluation_groups')->fetch_all(MYSQLI_ASSOC), 'criteria' => $mysqli->query('SELECT * FROM evaluation_criteria')->fetch_all(MYSQLI_ASSOC)], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

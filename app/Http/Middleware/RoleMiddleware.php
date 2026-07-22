@@ -19,8 +19,14 @@ class RoleMiddleware
             ], 401);
         }
 
-        // هل عنده الدور المطلوب؟
-        if (!$user->roles()->where('name', $role)->exists()) {
+        // السماح للمدير (admin) بتجاوز الصلاحيات وتعديل كافة النماذج
+        if ($user->roles()->where('name', 'admin')->exists()) {
+            return $next($request);
+        }
+
+        // هل عنده أي دور من الأدوار المطلوبة (يدعم الفصل برمز | مثل admin|committee_head)
+        $roles = explode('|', $role);
+        if (!$user->roles()->whereIn('name', $roles)->exists()) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 403);

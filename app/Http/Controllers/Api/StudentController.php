@@ -12,6 +12,7 @@ use App\Imports\StudentsImport;
 use Maatwebsite\Excel\Facades\Excel;
 class StudentController extends Controller
 {
+    // عرض جميع الطلاب مع المعلومات المرتبطة
     public function index()
     {
         $students = Student::with([
@@ -22,6 +23,7 @@ class StudentController extends Controller
         return response()->json($students);
     }
 
+    // إضافة طالب جديد
     public function store(StoreStudentRequest $request)
     {
         $student = Student::create([
@@ -37,6 +39,7 @@ class StudentController extends Controller
         ], 201);
     }
 
+    // عرض بيانات طالب واحد
     public function show(string $id)
     {
         $student = Student::with([
@@ -47,6 +50,7 @@ class StudentController extends Controller
         return response()->json($student);
     }
 
+    // تعديل بيانات طالب
     public function update(UpdateStudentRequest $request, string $id)
     {
         $student = Student::findOrFail($id);
@@ -64,6 +68,7 @@ class StudentController extends Controller
         ]);
     }
 
+    // حذف طالب
     public function destroy(string $id)
     {
         $student = Student::findOrFail($id);
@@ -75,6 +80,7 @@ class StudentController extends Controller
         ]);
     }
 
+    // استيراد الطلاب من ملف Excel
     public function import(Request $request)
 {/*
     $request->validate([

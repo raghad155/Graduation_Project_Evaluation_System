@@ -1,0 +1,1 @@
+<?php $mysqli = new mysqli('127.0.0.1', 'root', '', 'project_evaluation_system'); $res = $mysqli->query('SELECT * FROM evaluation_criteria'); while($r = $res->fetch_assoc()) print_r($r); echo 'ITEMS: '; $res2 = $mysqli->query('SELECT * FROM evaluation_items'); while($r2 = $res2->fetch_assoc()) print_r($r2);

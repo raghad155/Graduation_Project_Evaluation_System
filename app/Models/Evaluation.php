@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Evaluation extends Model
 {
+    // نموذج التقييم الخاص بالمشاريع من قبل المستخدمين
     protected $fillable = [
         'project_id',
         'user_id',
@@ -23,8 +24,14 @@ class Evaluation extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class, 'evaluation_id');
+    }
+
     public function scores()
-{
-    return $this->hasMany(EvaluationScore::class);
-}
+    {
+        return $this->hasMany(EvaluationScore::class);
+    }
 }

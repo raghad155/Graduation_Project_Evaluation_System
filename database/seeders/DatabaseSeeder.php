@@ -14,18 +14,35 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        // 1. تشغيل التغذية للأدوار والمدخلات الأساسية
+        $this->call([
+            RoleSeeder::class,
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-        
-User::create([
-    'full_name' => 'Ahmed',
-    'phone_number' => '777777777',
-    'password' => Hash::make('123456')
-]);
+        // السوبر أدمن الافتراضي
+        $admin = User::firstOrCreate(
+            ['phone_number' => '777777777'],
+            [
+                'full_name' => 'Ahmed',
+                'email' => 'admin@system.local',
+                'password' => Hash::make('123456')
+            ]
+        );
 
+        $adminRole = \App\Models\Role::where('name', 'admin')->first();
+        if ($adminRole && !$admin->roles()->where('role_id', $adminRole->id)->exists()) {
+            $admin->roles()->attach($adminRole->id);
+        }
+
+        // إسناد دور المشرف لجميع المستخدمين الذين تمت إضافتهم مسبقاً ولديهم إيميل أو يعتبرون مشرفين
+        $supervisorRole = \App\Models\Role::where('name', 'supervisor')->first();
+        if ($supervisorRole) {
+            $users = User::where('id', '!=', $admin->id)->get();
+            foreach ($users as $user) {
+                if (!$user->roles()->where('role_id', $supervisorRole->id)->exists()) {
+                    $user->roles()->attach($supervisorRole->id);
+                }
+            }
+        }
     }
 }

@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; require 'bootstrap/app.php'; \ = require_once 'bootstrap/app.php'; \ = \->make(Illuminate\Contracts\Console\Kernel::class); \->bootstrap(); echo json_encode([ 'Groups' => \App\Models\EvaluationGroup::count(), 'Criteria' => \App\Models\EvaluationCriterion::count(), 'Items' => \App\Models\EvaluationItem::count() ]);
