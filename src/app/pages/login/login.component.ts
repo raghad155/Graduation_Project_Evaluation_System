@@ -1,4 +1,4 @@
-import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -124,4 +124,7 @@ export class LoginComponent {
     return 'تعذر تسجيل الدخول. يرجى المحاولة مرة أخرى.';
   }
 }
+
+
+
 

@@ -1,4 +1,4 @@
-import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -449,4 +449,7 @@ export class ProjectResultDetailsComponent {
     });
   }
 }
+
+
+
 

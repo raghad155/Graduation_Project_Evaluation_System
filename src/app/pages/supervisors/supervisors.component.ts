@@ -1,4 +1,4 @@
-import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -151,4 +151,6 @@ export class SupervisorsComponent {
     });
   }
 }
+
+
 

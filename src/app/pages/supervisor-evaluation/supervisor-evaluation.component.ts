@@ -1,4 +1,4 @@
-import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -220,4 +220,7 @@ export class SupervisorEvaluationComponent implements OnInit {
             });
     }
 }
+
+
+
 

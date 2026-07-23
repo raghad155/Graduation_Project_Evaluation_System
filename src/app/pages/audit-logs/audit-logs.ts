@@ -1,4 +1,4 @@
-import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminDataService } from '../../core/admin-data.service';
@@ -37,4 +37,7 @@ export class AuditLogs implements OnInit {
     });
   }
 }
+
+
+
 

@@ -1,4 +1,4 @@
-import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AuditLogs } from './audit-logs';
@@ -22,4 +22,7 @@ describe('AuditLogs', () => {
     expect(component).toBeTruthy();
   });
 });
+
+
+
 

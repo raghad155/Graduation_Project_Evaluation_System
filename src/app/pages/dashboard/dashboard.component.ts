@@ -9,6 +9,7 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
+  imports: [NgClass, JsonPipe, IconComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -98,3 +99,6 @@ export class DashboardComponent {
     ];
   });
 }
+
+
+
