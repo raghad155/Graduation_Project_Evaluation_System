@@ -526,4 +526,85 @@ public function projectAverages()
 
 
     }
+
+    public function topLowProjects()
+    {
+        $projects = Project::with([
+            'evaluations.scores.criteria',
+            'students'
+        ])->get();
+
+        $results = [];
+
+        foreach ($projects as $project) {
+
+            $total = 0;
+            $count = 0;
+
+            foreach ($project->evaluations as $evaluation) {
+
+                foreach ($evaluation->scores as $score) {
+                    $weight = $score->criteria->weight ?? 0;
+                    $weighted = ($score->score * $weight) / 100;
+
+                    $total += $weighted;
+                    $count++;
+                }
+            }
+
+            $avg = $count > 0 ? $total / $count : 0;
+
+            $results[] = [
+                'project_id' => $project->id,
+                'project_title' => $project->title,
+                'average_score' => round($avg, 2)
+            ];
+        }
+
+        $sorted = collect($results)->sortByDesc('average_score')->values();
+
+        return response()->json([
+            'highest_project' => $sorted->first(),
+            'lowest_project' => $sorted->last(),
+            'all_projects' => $sorted
+        ]);
+    }
+
+    public function chartsData()
+    {
+        $projects = Project::with([
+            'evaluations.scores.criteria'
+        ])->get();
+
+        $chartData = [];
+
+        foreach ($projects as $project) {
+
+            $total = 0;
+            $count = 0;
+
+            foreach ($project->evaluations as $evaluation) {
+
+                foreach ($evaluation->scores as $score) {
+                    $weight = $score->criteria->weight ?? 0;
+                    $weighted = ($score->score * $weight) / 100;
+
+                    $total += $weighted;
+                    $count++;
+                }
+            }
+
+            $average = $count > 0 ? $total / $count : 0;
+
+            $chartData[] = [
+                'project_name' => $project->title,
+                'average_score' => round($average, 2)
+            ];
+        }
+
+        return response()->json([
+            'labels' => collect($chartData)->pluck('project_name'),
+            'data' => collect($chartData)->pluck('average_score')
+        ]);
+    }
 }
