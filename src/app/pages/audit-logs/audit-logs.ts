@@ -17,6 +17,7 @@ export class AuditLogs implements OnInit {
 
   logs: AuditLogRecord[] = [];
   loading = true;
+  errorMessage = '';
 
   get isArabic() {
     return this.prefs.state.language === 'ar';
@@ -28,7 +29,8 @@ export class AuditLogs implements OnInit {
         this.logs = data;
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        this.errorMessage = err.message || JSON.stringify(err);
         this.loading = false;
       }
     });

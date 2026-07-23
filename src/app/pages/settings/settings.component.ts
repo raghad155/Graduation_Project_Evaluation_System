@@ -15,6 +15,7 @@ import { AdminDataService } from '../../core/admin-data.service';
 export class SettingsComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly adminData = inject(AdminDataService);
   readonly preferences = inject(PreferencesService);
 
   readonly user = this.auth.currentUser;
@@ -155,13 +156,21 @@ export class SettingsComponent {
 
   downloadBackup(): void {
     // We use fetch and download blob to be safe with Bearer token
-    inject(AdminDataService).downloadJsonBackup().subscribe((blob: Blob) => {
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `system_backup_${new Date().getTime()}.json`;
-      link.click();
-      window.URL.revokeObjectURL(downloadUrl);
+    this.adminData.downloadJsonBackup().subscribe({
+      next: (blob: Blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `system_backup_${new Date().getTime()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+      },
+      error: (err) => {
+        console.error('Backup download failed', err);
+        alert('حدث خطأ أثناء محاولة جلب النسخة الاحتياطية. يرجى المحاولة لاحقاً.');
+      }
     });
   }
 }

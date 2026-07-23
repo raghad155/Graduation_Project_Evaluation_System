@@ -69,7 +69,7 @@
       </dl>
     </article>
 
-    @if (user?.role === 'admin') {
+    @if (user?.role === 'admin' || user?.role === 'committee_chair') {
     <article class="settings-panel panel backup-panel">
       <h2>{{ isArabic ? 'نسخ احتياطي للبيانات' : 'Data Backup' }}</h2>
       <div class="setting-row" style="display: flex; flex-direction: column; align-items: flex-start; gap: 15px;">

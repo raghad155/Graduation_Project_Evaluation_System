@@ -14,6 +14,10 @@
         <div class="loading-state">
             <span class="spinner"></span> {{ isArabic ? 'جاري تحميل السجلات...' : 'Loading Logs...' }}
         </div>
+        } @else if (errorMessage) {
+        <div class="empty-state error-state">
+            <p style="color: red;">Error: {{ errorMessage }}</p>
+        </div>
         } @else if (logs.length === 0) {
         <div class="empty-state">
             <p>{{ isArabic ? 'لا توجد سجلات بعد.' : 'No audit logs found yet.' }}</p>
