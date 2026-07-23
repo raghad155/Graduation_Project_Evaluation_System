@@ -51,22 +51,22 @@ export class LayoutComponent {
   sidebarOpen = false;
 
   readonly navLinks: NavLink[] = [
-    { labelEn: 'Dashboard', labelAr: 'لوحة التحكم', icon: 'dashboard', route: '/dashboard', roles: ['admin'] },
+    { labelEn: 'Dashboard', labelAr: 'لوحة التحكم', icon: 'dashboard', route: '/dashboard', roles: ['admin', 'committee_chair'] },
     { labelEn: 'Supervisor Page', labelAr: 'صفحة المشرف', icon: 'supervisor', route: '/supervisor', roles: ['supervisor'] },
     { labelEn: 'Committee Head', labelAr: 'رئيس اللجنة', icon: 'committee-chair', route: '/committee-chair', roles: ['committee_chair'] },
     { labelEn: 'Committee Member', labelAr: 'عضو اللجنة', icon: 'committee-member', route: '/committee-member', roles: ['committee_member'] },
-    { labelEn: 'Users', labelAr: 'المستخدمون', icon: 'users', route: '/users', roles: ['admin'] },
-    { labelEn: 'Students', labelAr: 'الطلاب', icon: 'students', route: '/students', roles: ['admin'] },
-    { labelEn: 'Excel Import', labelAr: 'استيراد Excel', icon: 'import', route: '/students/import', roles: ['admin'] },
+    { labelEn: 'Users', labelAr: 'المستخدمون', icon: 'users', route: '/users', roles: ['admin', 'committee_chair'] },
+    { labelEn: 'Students', labelAr: 'الطلاب', icon: 'students', route: '/students', roles: ['admin', 'committee_chair'] },
+    { labelEn: 'Excel Import', labelAr: 'استيراد Excel', icon: 'import', route: '/students/import', roles: ['admin', 'committee_chair'] },
     { labelEn: 'Supervisors', labelAr: 'المشرفون', icon: 'supervisors', route: '/supervisors', roles: ['admin', 'committee_chair'] },
     { labelEn: 'Committees', labelAr: 'لجان المناقشة', icon: 'committee-member', route: '/committees', roles: ['admin', 'committee_chair'] },
-    { labelEn: 'Projects', labelAr: 'المشاريع', icon: 'projects', route: '/projects', roles: ['admin'] },
+    { labelEn: 'Projects', labelAr: 'المشاريع', icon: 'projects', route: '/projects', roles: ['admin', 'committee_chair'] },
     { labelEn: 'Project Members', labelAr: 'أعضاء المشاريع', icon: 'members', route: '/project-members', roles: ['admin', 'committee_chair'] },
     { labelEn: 'Evaluation Setup', labelAr: 'إعداد التقييمات', icon: 'evaluations', route: '/evaluations', roles: ['admin', 'committee_chair', 'supervisor'] },
     { labelEn: 'Project Evaluation Forms', labelAr: 'نماذج تقييم المشاريع', icon: 'results', route: '/project-evaluation-forms', roles: allRoles },
     { labelEn: 'Supervisor Evaluation', labelAr: 'تقييم المشروع', icon: 'evaluations', route: '/supervisor-evaluation', roles: ['supervisor'] },
-    { labelEn: 'Permissions', labelAr: 'الصلاحيات', icon: 'permissions', route: '/role-permissions', roles: ['admin'] },
-    { labelEn: 'Audit Trails', labelAr: 'سجلات التدقيق', icon: 'audit', route: '/audit-logs', roles: ['admin'] },
+    { labelEn: 'Permissions', labelAr: 'الصلاحيات', icon: 'permissions', route: '/role-permissions', roles: ['admin', 'committee_chair'] },
+    { labelEn: 'Audit Trails', labelAr: 'سجلات التدقيق', icon: 'audit', route: '/audit-logs', roles: ['admin', 'committee_chair'] },
     { labelEn: 'Settings', labelAr: 'الإعدادات', icon: 'settings', route: '/settings', roles: allRoles }
   ];
 

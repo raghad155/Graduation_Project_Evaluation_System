@@ -77,7 +77,7 @@ export class RolePermissionsService {
 
   private readonly defaults: PermissionState = {
     supervisor: ['/supervisor', '/supervisor-evaluation', '/project-members', '/settings', '/evaluations'],
-    committee_chair: ['/committee-chair', '/project-evaluation-forms', '/settings', '/evaluations'],
+    committee_chair: ['/committee-chair', '/project-evaluation-forms', '/settings', '/evaluations', '/dashboard', '/audit-logs', '/role-permissions', '/users', '/students', '/students/import', '/supervisors', '/committees', '/projects', '/project-members'],
     committee_member: ['/committee-member', '/project-evaluation-forms', '/settings']
   };
 

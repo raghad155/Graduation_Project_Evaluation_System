@@ -19,13 +19,13 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         canActivate: [roleGuard],
-        data: { roles: ['admin'] },
+        data: { roles: ['admin', 'committee_chair'] },
         loadComponent: () => import('./pages/dashboard/dashboard.component').then((m) => m.DashboardComponent)
       },
       {
         path: 'users',
         canActivate: [roleGuard],
-        data: { roles: ['admin'] },
+        data: { roles: ['admin', 'committee_chair'] },
         loadComponent: () => import('./pages/users/users.component').then((m) => m.UsersComponent)
       },
       {
@@ -37,19 +37,19 @@ export const routes: Routes = [
       {
         path: 'role-permissions',
         canActivate: [roleGuard],
-        data: { roles: ['admin'] },
+        data: { roles: ['admin', 'committee_chair'] },
         loadComponent: () => import('./pages/role-permissions/role-permissions.component').then((m) => m.RolePermissionsComponent)
       },
       {
         path: 'students',
         canActivate: [roleGuard],
-        data: { roles: ['admin'] },
+        data: { roles: ['admin', 'committee_chair'] },
         loadComponent: () => import('./pages/students/students.component').then((m) => m.StudentsComponent)
       },
       {
         path: 'students/import',
         canActivate: [roleGuard],
-        data: { roles: ['admin'] },
+        data: { roles: ['admin', 'committee_chair'] },
         loadComponent: () => import('./pages/student-import/student-import.component').then((m) => m.StudentImportComponent)
       },
       {
@@ -69,7 +69,7 @@ export const routes: Routes = [
       {
         path: 'projects',
         canActivate: [roleGuard],
-        data: { roles: ['admin'] },
+        data: { roles: ['admin', 'committee_chair'] },
         loadComponent: () => import('./pages/projects/projects.component').then((m) => m.ProjectsComponent)
       },
       {
@@ -82,7 +82,7 @@ export const routes: Routes = [
         path: 'audit-logs',
         loadComponent: () => import('./pages/audit-logs/audit-logs').then(m => m.AuditLogs),
         canActivate: [roleGuard],
-        data: { roles: ['admin'] }
+        data: { roles: ['admin', 'committee_chair'] }
       },
       {
         path: 'evaluations',
