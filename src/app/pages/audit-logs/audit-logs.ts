@@ -1,3 +1,4 @@
+import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminDataService } from '../../core/admin-data.service';
@@ -7,7 +8,7 @@ import { AuditLogRecord } from '../../core/models';
 @Component({
   selector: 'app-audit-logs',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './audit-logs.html',
   styleUrl: './audit-logs.scss'
 })
@@ -36,3 +37,4 @@ export class AuditLogs implements OnInit {
     });
   }
 }
+

@@ -1,3 +1,4 @@
+import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,7 +15,7 @@ interface DepartmentOption {
 @Component({
   selector: 'app-supervisors',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, IconComponent],
   templateUrl: './supervisors.component.html'
 })
 export class SupervisorsComponent {
@@ -150,3 +151,4 @@ export class SupervisorsComponent {
     });
   }
 }
+

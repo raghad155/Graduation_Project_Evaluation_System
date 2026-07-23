@@ -1,3 +1,4 @@
+import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -31,7 +32,7 @@ interface ScoreEntry {
 @Component({
     selector: 'app-supervisor-evaluation',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, IconComponent],
     templateUrl: './supervisor-evaluation.component.html',
     styleUrls: ['./supervisor-evaluation.component.scss']
 })
@@ -219,3 +220,4 @@ export class SupervisorEvaluationComponent implements OnInit {
             });
     }
 }
+

@@ -1,3 +1,4 @@
+import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { Component, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,7 +29,7 @@ const usernameOrEmailValidator: ValidatorFn = (control: AbstractControl): Valida
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, IconComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -123,3 +124,4 @@ export class LoginComponent {
     return 'تعذر تسجيل الدخول. يرجى المحاولة مرة أخرى.';
   }
 }
+

@@ -1,3 +1,4 @@
+import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -9,7 +10,7 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
     selector: 'app-committees',
     standalone: true,
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, IconComponent],
     templateUrl: './committees.component.html',
     styleUrl: './committees.component.scss' // we can just use management-page generic styles but we'll create one
 })
@@ -155,3 +156,4 @@ export class CommitteesComponent {
         setTimeout(() => this.message = '', 5000);
     }
 }
+
