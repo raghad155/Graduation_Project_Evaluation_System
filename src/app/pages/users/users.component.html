@@ -1,0 +1,157 @@
+<section class="management-page users-page">
+    <header class="management-header">
+        <div>
+            <h1 class="page-title">{{ isArabic ? 'إدارة المستخدمين' : 'User Management' }}</h1>
+            <p class="page-subtitle">
+                {{ isArabic
+                ? 'أنشئ حسابات المستخدمين وحدد أدوارهم (يمكن اختيار أكثر من دور).'
+                : 'Create accounts and assign roles — multiple roles per user supported.' }}
+            </p>
+        </div>
+        <button class="primary-button" type="button" (click)="openAddForm()">
+            + {{ isArabic ? 'إضافة مستخدم' : 'Add User' }}
+        </button>
+    </header>
+
+    <!-- رسالة -->
+    @if (message()) {
+    <p class="form-message" [class.success]="messageType() === 'success'" [class.error]="messageType() === 'error'">
+        {{ message() }}
+    </p>
+    }
+
+    <!-- نموذج إضافة / تعديل -->
+    @if (showForm()) {
+    <article class="panel form-panel">
+        <h2>{{ isEditing ? (isArabic ? 'تعديل مستخدم' : 'Edit User') : (isArabic ? 'إضافة مستخدم جديد' : 'New User') }}
+        </h2>
+        <form [formGroup]="form" (ngSubmit)="save()">
+            <div class="grid-form">
+                <!-- الاسم -->
+                <label class="field">
+                    <span>{{ isArabic ? 'الاسم الكامل *' : 'Full Name *' }}</span>
+                    <input formControlName="full_name"
+                        [placeholder]="isArabic ? 'أدخلي الاسم الكامل' : 'Enter full name'">
+                    @if (form.controls.full_name.invalid && form.controls.full_name.touched) {
+                    <small class="field-error">{{ isArabic ? 'الاسم مطلوب (3 أحرف).' : 'Required (min 3 chars).'
+                        }}</small>
+                    }
+                </label>
+
+                <!-- رقم الهاتف -->
+                <label class="field">
+                    <span>{{ isArabic ? 'رقم الهاتف *' : 'Phone *' }}</span>
+                    <input formControlName="phone_number" type="tel" maxlength="9"
+                        [placeholder]="isArabic ? 'مثال: 712345678' : '712345678'">
+                    @if (form.controls.phone_number.invalid && form.controls.phone_number.touched) {
+                    <small class="field-error">{{ isArabic ? 'يجب أن يكون 9 أرقام ويبدأ بـ 7 (مثال: 712345678)' : 'Must
+                        be 9 digits starting with 7 (e.g. 712345678)' }}</small>
+                    }
+                </label>
+
+                <!-- البريد -->
+                <label class="field">
+                    <span>{{ isArabic ? 'البريد الإلكتروني (اختياري)' : 'Email (optional)' }}</span>
+                    <input formControlName="email" type="email" placeholder="example@domain.com">
+                </label>
+
+                <!-- كلمة المرور -->
+                <label class="field">
+                    <span>
+                        {{ isArabic ? 'كلمة المرور' : 'Password' }}
+                        {{ isEditing ? (isArabic ? '(اتركيها فارغة للإبقاء)' : '(blank = keep)') : '*' }}
+                    </span>
+                    <input formControlName="password" type="password"
+                        [placeholder]="isArabic ? 'كلمة المرور' : 'Password'">
+                    @if (form.controls.password.invalid && form.controls.password.touched && !isEditing) {
+                    <small class="field-error">{{ isArabic ? 'مطلوبة (6 أحرف).' : 'Required (min 6).' }}</small>
+                    }
+                </label>
+            </div>
+
+            <!-- اختيار الأدوار — checkboxes -->
+            <div class="roles-section">
+                <span class="roles-label">{{ isArabic ? 'الأدوار في النظام *' : 'System Roles *' }}</span>
+                <p class="roles-hint">{{ isArabic ? 'يمكن اختيار أكثر من دور للمستخدم الواحد' : 'A user can hold
+                    multiple roles simultaneously' }}</p>
+                <div class="roles-grid">
+                    @for (role of roles; track role.value) {
+                    <label class="role-checkbox" [class.active]="isRoleSelected(role.value)">
+                        <input type="checkbox" [checked]="isRoleSelected(role.value)" (change)="toggleRole(role.value)">
+                        <span class="role-check-label">{{ isArabic ? role.labelAr : role.labelEn }}</span>
+                    </label>
+                    }
+                </div>
+            </div>
+
+            <div class="button-row form-actions">
+                <button class="primary-button" type="submit">
+                    {{ isEditing ? (isArabic ? 'تحديث' : 'Update') : (isArabic ? 'إنشاء الحساب' : 'Create') }}
+                </button>
+                <button class="secondary-button" type="button" (click)="cancelForm()">
+                    {{ isArabic ? 'إلغاء' : 'Cancel' }}
+                </button>
+            </div>
+        </form>
+    </article>
+    }
+
+    <!-- جدول المستخدمين -->
+    <article class="panel">
+        <header class="table-header">
+            <h2>{{ isArabic ? 'قائمة المستخدمين' : 'Users List' }}</h2>
+            <span class="status-pill">{{ users().length }} {{ isArabic ? 'مستخدم' : 'users' }}</span>
+        </header>
+
+        @if (loading()) {
+        <p class="loading-text">{{ isArabic ? 'جارٍ التحميل...' : 'Loading...' }}</p>
+        } @else if (users().length === 0) {
+        <div class="empty-state">
+            <strong>{{ isArabic ? 'لا يوجد مستخدمون بعد' : 'No users yet' }}</strong>
+            <span>{{ isArabic ? 'ابدئي بإضافة مستخدم جديد.' : 'Add your first user.' }}</span>
+        </div>
+        } @else {
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>{{ isArabic ? 'الاسم' : 'Name' }}</th>
+                        <th>{{ isArabic ? 'الهاتف' : 'Phone' }}</th>
+                        <th>{{ isArabic ? 'البريد' : 'Email' }}</th>
+                        <th>{{ isArabic ? 'الأدوار' : 'Roles' }}</th>
+                        <th>{{ isArabic ? 'الإجراءات' : 'Actions' }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (user of users(); track user.id; let i = $index) {
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td class="name-cell">{{ user.full_name }}</td>
+                        <td>{{ user.phone_number }}</td>
+                        <td>{{ user.email || '—' }}</td>
+                        <td>
+                            <div class="roles-badges">
+                                @for (r of (user.roles?.length ? user.roles : [user.role]); track r) {
+                                <span class="role-badge" [attr.data-role]="r">{{ roleLabelFor([r]) }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="button-row actions">
+                                <button class="action-button action-edit" type="button" (click)="openEditForm(user)">
+                                    &#9998; {{ isArabic ? 'تعديل' : 'Edit' }}
+                                </button>
+                                <button class="action-button action-delete" type="button" (click)="deleteUser(user)">
+                                    &#128465; {{ isArabic ? 'حذف' : 'Delete' }}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </article>
+</section>

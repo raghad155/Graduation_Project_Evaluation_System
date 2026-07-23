@@ -1,0 +1,51 @@
+<section class="permissions-page">
+  <header class="management-header">
+    <div>
+      <h1 class="page-title">{{ pageTitle }}</h1>
+      <p class="page-subtitle">{{ pageSubtitle }}</p>
+    </div>
+
+    <span class="status-pill">{{ noteText }}</span>
+  </header>
+
+  <div class="roles-grid">
+    @for (role of roles; track role) {
+      <article class="role-card panel">
+        <header class="role-card-header">
+          <div>
+            <span class="role-kicker">{{ isArabic ? 'الدور' : 'Role' }}</span>
+            <h2>{{ roleLabel(role) }}</h2>
+          </div>
+
+          <span class="permission-count">
+            {{ enabledCount(role) }} / {{ features.length }}
+            {{ isArabic ? 'مفعلة' : 'enabled' }}
+          </span>
+        </header>
+
+        <div class="permission-list">
+          @for (feature of features; track feature.route) {
+            <label class="permission-row">
+              <input
+                type="checkbox"
+                [checked]="enabled(role, feature.route)"
+                (change)="toggle(role, feature.route, $event)"
+              >
+
+              <span class="switch" aria-hidden="true"></span>
+
+              <span class="permission-copy">
+                <strong>{{ featureLabel(feature.route) }}</strong>
+                <small>{{ featureDescription(feature.route) }}</small>
+              </span>
+            </label>
+          }
+        </div>
+
+        <button class="ghost-button" type="button" (click)="reset(role)">
+          {{ isArabic ? 'استعادة الافتراضي' : 'Reset defaults' }}
+        </button>
+      </article>
+    }
+  </div>
+</section>

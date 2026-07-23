@@ -1,0 +1,40 @@
+.project-summary {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: rgba(35, 95, 143, 0.06);
+}
+
+.project-summary div {
+  display: grid;
+  gap: 4px;
+}
+
+.project-summary span {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.project-summary strong {
+  font-size: 17px;
+}
+
+.project-summary p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+
+.members-table {
+  min-width: 820px;
+}
+
+.member-notes-row td {
+  padding-top: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}

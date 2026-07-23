@@ -1,0 +1,124 @@
+.import-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.template-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.upload-panel {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.upload-panel h2 {
+  margin: 0;
+}
+
+.import-type-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #f2f5f8;
+}
+
+.import-type-switch button {
+  min-height: 38px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.import-type-switch button.active {
+  background: var(--color-panel);
+  color: var(--color-primary-dark);
+  box-shadow: 0 1px 8px rgba(24, 37, 54, 0.08);
+}
+
+.upload-box {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 190px;
+  padding: 22px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  background: #fbfdff;
+  text-align: center;
+  cursor: pointer;
+}
+
+.upload-box.has-file {
+  border-color: var(--color-accent);
+  background: rgba(24, 169, 153, 0.08);
+}
+
+.upload-box input {
+  display: none;
+}
+
+.upload-box span {
+  color: var(--color-primary-dark);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.upload-box small {
+  color: var(--color-muted);
+}
+
+.upload-panel .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.result-box {
+  padding: 16px;
+  border-radius: var(--radius);
+  background: rgba(24, 169, 153, 0.1);
+  color: #0f766e;
+}
+
+.result-box.error {
+  background: rgba(194, 65, 75, 0.08);
+  color: var(--color-danger);
+}
+
+.result-box ul {
+  margin: 10px 0 0;
+  padding-inline-start: 20px;
+}
+
+.result-table-wrap {
+  margin-top: 14px;
+}
+
+.result-table {
+  min-width: 420px;
+}
+
+:host-context(body.theme-dark) .upload-box {
+  background: #111b28;
+}
+
+@media (max-width: 820px) {
+  .import-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .template-actions {
+    justify-content: flex-start;
+  }
+}

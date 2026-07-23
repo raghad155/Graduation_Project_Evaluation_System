@@ -1,0 +1,59 @@
+<main class="login-page">
+  <section class="login-hero" aria-label="Graduation project evaluation">
+    <img class="brand-mark" src="/assets/ges-logo.png" alt="GES logo">
+    <h1>{{ isArabic ? 'نظام تقييم مشاريع التخرج' : 'Graduation Project Evaluation System' }}</h1>
+    <p>
+    </p>
+  </section>
+
+  <section class="login-panel panel" aria-label="Login form">
+    <div class="panel-heading">
+      <span class="eyebrow">{{ isArabic ? 'مرحبًا' : 'Welcome' }}</span>
+      <h2>{{ isArabic ? 'تسجيل الدخول' : 'Login' }}</h2>
+      <p>{{ isArabic ? 'استخدم اسم المستخدم أو البريد مع كلمة المرور.' : 'Use your username or email with your password.' }}</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="field">
+        <span>{{ isArabic ? 'اسم المستخدم / البريد' : 'Username / Email' }}</span>
+        <input
+          type="text"
+          formControlName="login"
+          autocomplete="username"
+          placeholder="Ahmed"
+          [class.field-invalid]="isInvalid('login')"
+        >
+        @if (fieldError('login')) {
+          <small>{{ fieldError('login') }}</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>{{ isArabic ? 'كلمة المرور' : 'Password' }}</span>
+        <input
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          placeholder="password"
+          [class.field-invalid]="isInvalid('password')"
+        >
+        @if (fieldError('password')) {
+          <small>{{ fieldError('password') }}</small>
+        }
+      </label>
+
+      @if (errorMessage) {
+        <div class="form-alert" role="alert">{{ translatedLoginError() }}</div>
+      }
+
+      <button class="primary-button" type="submit" [disabled]="submitting">
+        @if (submitting) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>{{ isArabic ? 'جاري الدخول...' : 'Signing in...' }}</span>
+        } @else {
+          <span>{{ isArabic ? 'دخول' : 'Login' }}</span>
+        }
+      </button>
+    </form>
+  </section>
+</main>

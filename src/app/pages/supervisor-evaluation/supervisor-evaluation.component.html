@@ -1,0 +1,163 @@
+<div class="page-wrapper">
+    <header class="page-head">
+        <h1 class="page-title">تقييم المشرف</h1>
+        <p class="page-subtitle">قم بتقييم طلاب مشاريعك بشكل مستقل باستخدام نماذج التقييم الخاصة بك</p>
+    </header>
+
+    <!-- Loading -->
+    @if (loading) {
+    <div class="spinner-block">
+        <div class="spinner"></div>
+        <p>جارِ تحميل البيانات...</p>
+    </div>
+    }
+
+    @if (!loading) {
+    <div class="eval-layout">
+
+        <!-- LEFT PANEL: Projects & Students -->
+        <aside class="side-panel panel">
+            <div class="panel-header">
+                <h2>مشاريعي</h2>
+            </div>
+            <div class="project-list scrollable-vector">
+                @if (projects.length === 0) {
+                <p class="empty-note">لا توجد مشاريع مخصصة لك</p>
+                }
+                @for (project of projects; track project.id) {
+                <div class="project-card" [class.active]="selectedProject?.id === project.id"
+                    (click)="selectProject(project)">
+                    <span class="project-icon">📁</span>
+                    <span class="project-name">{{ project.name }}</span>
+                    <span class="student-count">{{ project.students.length }} طالب</span>
+                </div>
+                }
+            </div>
+
+            @if (selectedProject) {
+            <div class="students-section">
+                <h3 class="students-title">طلاب — {{ selectedProject.name }}</h3>
+                @for (student of selectedProject.students; track student.id) {
+                <div class="student-chip" [class.active]="selectedStudent?.id === student.id"
+                    (click)="selectStudent(student)">
+                    👤 {{ student.name }}
+                </div>
+                }
+            </div>
+            }
+        </aside>
+
+        <!-- CENTER: Evaluation Form -->
+        <main class="eval-main">
+            @if (!selectedStudent) {
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>اختر مشروعاً ثم طالباً لبدء التقييم</h3>
+                <p>انقر على أحد المشاريع من القائمة اليسرى، ثم اختر الطالب للبدء</p>
+            </div>
+            }
+
+            @if (selectedStudent && supervisorGroups.length === 0) {
+            <div class="empty-state warning">
+                <div class="empty-icon">⚠️</div>
+                <h3>لا يوجد نموذج تقييم خاص بك</h3>
+                <p>أضف نموذج تقييم أولاً من اللوحة اليمنى</p>
+            </div>
+            }
+
+            @if (selectedStudent && supervisorGroups.length > 0) {
+            <div class="eval-form-header">
+                <div>
+                    <h2>تقييم: {{ selectedStudent.name }}</h2>
+                    <p>المشروع: {{ selectedProject?.name }}</p>
+                </div>
+                <div class="total-badge">المجموع: {{ computeTotal() }} / 100</div>
+            </div>
+
+            @for (group of supervisorGroups; track group.id) {
+            <div class="group-card panel">
+                <div class="group-header">
+                    <h3>{{ group.title }}</h3>
+                    <span class="weight-badge">{{ group.weight }}%</span>
+                </div>
+
+                @for (criterion of group.criteria; track criterion.id) {
+                <div class="criterion-block">
+                    <div class="criterion-label">{{ criterion.name }} <span class="w-tag">({{ criterion.weight
+                            }}%)</span></div>
+
+                    @for (item of criterion.items; track item.id) {
+                    <div class="item-row">
+                        <label class="item-label">{{ item.label }}</label>
+                        <input type="number" class="score-input" min="0" max="100"
+                            [value]="getScore(criterion.id, item.id)"
+                            (input)="setScore(criterion.id, item.id, +$any($event.target).value)" />
+                        <input type="text" class="notes-input" placeholder="ملاحظات..."
+                            [value]="getNotes(criterion.id, item.id)"
+                            (input)="setNotes(criterion.id, item.id, $any($event.target).value)" />
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+
+            <!-- Save Button -->
+            <div class="save-bar">
+                @if (saveSuccess) {
+                <div class="alert-success">✅ تم حفظ التقييم بنجاح!</div>
+                }
+                @if (saveError) {
+                <div class="alert-error">❌ {{ saveError }}</div>
+                }
+                <button class="btn-save" (click)="saveScores()" [disabled]="saving">
+                    {{ saving ? 'جارِ الحفظ...' : '💾 حفظ التقييم' }}
+                </button>
+            </div>
+            }
+        </main>
+
+        <!-- RIGHT PANEL: My Evaluation Groups -->
+        <aside class="right-panel panel">
+            <div class="panel-header">
+                <h2>نماذج التقييم</h2>
+                <button class="btn-add" (click)="showGroupForm = !showGroupForm">
+                    {{ showGroupForm ? '✕ إلغاء' : '+ إضافة نموذج' }}
+                </button>
+            </div>
+
+            @if (showGroupForm) {
+            <form class="group-form" (ngSubmit)="createGroup()">
+                <input type="text" placeholder="عنوان النموذج" [(ngModel)]="newGroup.title" name="title" required />
+                <textarea placeholder="وصف اختياري" [(ngModel)]="newGroup.description" name="desc" rows="2"></textarea>
+                <label>الوزن النسبي (%)</label>
+                <input type="number" min="1" max="100" [(ngModel)]="newGroup.weight" name="weight" />
+                <button type="submit" class="btn-create" [disabled]="groupSaving">
+                    {{ groupSaving ? 'جارِ الإنشاء...' : 'إنشاء النموذج' }}
+                </button>
+            </form>
+            }
+
+            <div class="groups-list scrollable-vector">
+                @if (supervisorGroups.length === 0) {
+                <p class="empty-note">لا يوجد نماذج تقييم بعد.</p>
+                }
+                @for (group of supervisorGroups; track group.id) {
+                <div class="group-item">
+                    <div class="group-info">
+                        <span class="group-title">{{ group.title }}</span>
+                        <span class="group-weight">{{ group.weight }}%</span>
+                    </div>
+                    <button class="btn-delete" (click)="deleteGroup(group.id)" title="حذف النموذج">🗑</button>
+                </div>
+                }
+            </div>
+
+            <div class="info-box">
+                <p>💡 <strong>ملاحظة:</strong> تقييم المشرف يُحفظ بشكل مستقل ولا يُدمج مع درجات لجنة المناقشة.</p>
+            </div>
+        </aside>
+
+    </div>
+    }
+</div>

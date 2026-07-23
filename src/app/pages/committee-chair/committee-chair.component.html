@@ -1,0 +1,28 @@
+<section class="role-page">
+  <header>
+    <h1 class="page-title">{{ isArabic ? 'صفحة رئيس اللجنة' : 'Committee Head Page' }}</h1>
+    <p class="page-subtitle">
+      {{ isArabic ? 'واجهة مبدئية لإدارة اللجنة ومراجعة جاهزية التقييمات.' : 'Initial page for managing the committee and reviewing evaluation readiness.' }}
+    </p>
+  </header>
+
+  <div class="role-grid">
+    <article class="role-card panel">
+      <span>{{ isArabic ? 'اللجنة' : 'Committee' }}</span>
+      <h2>{{ isArabic ? 'أعضاء اللجنة' : 'Committee Members' }}</h2>
+      <p>{{ isArabic ? 'مساحة جاهزة لتوزيع أعضاء اللجنة على المشاريع.' : 'Prepared area for assigning committee members to projects.' }}</p>
+    </article>
+
+    <article class="role-card panel">
+      <span>{{ isArabic ? 'المراجعات' : 'Reviews' }}</span>
+      <h2>{{ isArabic ? 'مراجعة التقييمات' : 'Evaluation Reviews' }}</h2>
+      <p>{{ isArabic ? 'مساحة جاهزة لمتابعة التقييمات المكتملة والناقصة.' : 'Prepared area for tracking completed and missing evaluations.' }}</p>
+    </article>
+
+    <article class="role-card panel">
+      <span>{{ isArabic ? 'الاعتماد' : 'Approval' }}</span>
+      <h2>{{ isArabic ? 'اعتماد الدرجات' : 'Score Approval' }}</h2>
+      <p>{{ isArabic ? 'مساحة جاهزة لاعتماد النتائج النهائية بعد اكتمال التقييم.' : 'Prepared area for approving final results after evaluation is complete.' }}</p>
+    </article>
+  </div>
+</section>

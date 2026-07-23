@@ -1,0 +1,169 @@
+.settings-page {
+  display: grid;
+  gap: 22px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.settings-panel {
+  padding: 22px;
+}
+
+.settings-panel h2 {
+  margin: 0 0 18px;
+  font-size: 20px;
+}
+
+.account-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: rgba(35, 95, 143, 0.06);
+}
+
+.account-card > span {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-card strong,
+.account-card small {
+  display: block;
+}
+
+.account-card small {
+  margin-top: 3px;
+  color: var(--color-muted);
+}
+
+.password-panel {
+  grid-column: 1 / -1;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.setting-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.setting-row p {
+  margin: 5px 0 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.segmented-control {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-self: start;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #edf3f8;
+}
+
+.segmented-control button {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.segmented-control button.active {
+  background: var(--color-panel);
+  color: var(--color-primary-dark);
+  box-shadow: 0 8px 22px rgba(24, 37, 54, 0.08);
+}
+
+.account-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.account-list div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.account-list dt {
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.account-list dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.password-panel .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.password-strength {
+  display: grid;
+  gap: 6px;
+}
+
+.password-strength div {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(107, 119, 136, 0.18);
+}
+
+.password-strength span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-danger), var(--color-warning), var(--color-accent));
+  transition: width 0.2s ease;
+}
+
+.password-strength small {
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+@media (max-width: 860px) {
+  .settings-grid,
+  .setting-row,
+  .account-list div {
+    grid-template-columns: 1fr;
+  }
+
+  .setting-row {
+    display: grid;
+  }
+}

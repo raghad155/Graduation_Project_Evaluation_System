@@ -1,0 +1,320 @@
+﻿import { Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AdminDataService } from '../../core/admin-data.service';
+import { EvaluationCriterionRecord, EvaluationGroupRecord, EvaluationItemRecord, ProjectRecord } from '../../core/models';
+import { PreferencesService } from '../../core/preferences.service';
+
+@Component({
+  selector: 'app-evaluations',
+  standalone: true,
+  imports: [ReactiveFormsModule, FormsModule],
+  templateUrl: './evaluations.component.html',
+  styleUrl: './evaluations.component.scss'
+})
+export class EvaluationsComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly data = inject(AdminDataService);
+  readonly preferences = inject(PreferencesService);
+  readonly itemPercentages = [25, 50, 75, 100] as const;
+
+  readonly groups = toSignal(this.data.evaluationGroups$, { initialValue: [] as EvaluationGroupRecord[] });
+  readonly projects = toSignal(this.data.projects$, { initialValue: [] as ProjectRecord[] });
+  readonly selectedGroupId = signal(0);
+  readonly selectedCriterionId = signal(0);
+  readonly selectedGroup = computed(() => this.groups().find((group) => group.id === this.selectedGroupId()) ?? null);
+  readonly selectedCriterion = computed(() => {
+    return this.selectedGroup()?.criteria.find((criterion) => criterion.id === this.selectedCriterionId()) ?? null;
+  });
+  readonly totalGroupWeight = computed(() => this.groups().reduce((total, group) => total + group.weight, 0));
+
+  // مجموع الدرجات الإجمالي المحسوب تلقائيًا والذي سيُرسل للباك إند
+  readonly totalMaxScore = computed(() => {
+    return this.groups().reduce((total, group) => {
+      return total + group.criteria.reduce((criteriaTotal, criterion) => {
+        return criteriaTotal + this.criterionMaxScore(criterion);
+      }, 0);
+    }, 0);
+  });
+
+  groupMessage = '';
+  criterionMessage = '';
+  itemMessage = '';
+  evaluationSubmitMessage = ''; // رسالة نجاح أو فشل حفظ التقييم النهائي
+
+  editingGroupId: number | null = null;
+  editingCriterionId: number | null = null;
+
+  readonly groupForm = this.fb.nonNullable.group({
+    title: ['', [Validators.required, Validators.minLength(3)]],
+    description: [''],
+    weight: [25, [Validators.required, Validators.min(0), Validators.max(100)]],
+    specialization_id: ['' as string | number]
+  });
+
+  readonly criterionForm = this.fb.nonNullable.group({
+    title: ['', [Validators.required, Validators.minLength(3)]],
+    weight: [100, [Validators.required, Validators.min(1), Validators.max(100)]]
+  });
+
+  readonly itemForms = this.itemPercentages.map(() => this.fb.nonNullable.group({
+    title: ['', [Validators.required]],
+    description: ['']
+  }));
+
+  // نموذج إدخال الملاحظات الاختيارية للتقييم النهائي للمشروع
+  readonly finalEvaluationForm = this.fb.nonNullable.group({
+    projectId: [0, [Validators.required, Validators.min(1)]],
+    notes: ['']
+  });
+
+  get isArabic(): boolean {
+    return this.preferences.state.language === 'ar';
+  }
+
+  selectGroup(groupId: number | string): void {
+    const numericGroupId = Number(groupId);
+    this.selectedGroupId.set(numericGroupId);
+    this.selectedCriterionId.set(this.selectedGroup()?.criteria[0]?.id ?? 0);
+    this.criterionMessage = '';
+    this.itemMessage = '';
+    this.hydrateItemForms();
+  }
+
+  selectCriterion(criterionId: number | string): void {
+    const numericCriterionId = Number(criterionId);
+    this.selectedCriterionId.set(numericCriterionId);
+    this.itemMessage = '';
+    this.hydrateItemForms();
+  }
+
+  criterionMaxScore(criterion: EvaluationCriterionRecord): number {
+    return this.sortedItems(criterion).reduce((max, item) => Math.max(max, item.maxScore), criterion.weight);
+  }
+
+  sortedItems(criterion: EvaluationCriterionRecord): EvaluationItemRecord[] {
+    return [...criterion.items].sort((first, second) => first.maxScore - second.maxScore || first.id - second.id);
+  }
+
+  itemScoreForPercentage(criterion: EvaluationCriterionRecord | null, percentage: number): number {
+    if (!criterion) {
+      return 0;
+    }
+    return Math.max(1, Math.round((criterion.weight * percentage) / 100));
+  }
+
+  saveGroup(): void {
+    this.groupMessage = '';
+
+    if (this.groupForm.invalid) {
+      this.groupForm.markAllAsTouched();
+      this.groupMessage = this.isArabic ? 'أكملي بيانات فئة التقييم.' : 'Complete the evaluation category fields.';
+      return;
+    }
+
+    const value = this.groupForm.getRawValue();
+    this.data.upsertEvaluationGroup({
+      id: this.editingGroupId ?? undefined,
+      title: value.title.trim(),
+      description: value.description.trim(),
+      weight: value.weight,
+      specialization_id: value.specialization_id ? Number(value.specialization_id) : null
+    }).subscribe({
+      next: (res) => {
+        if (res?.id) {
+          this.selectGroup(res.id);
+          this.editingGroupId = res.id;
+        }
+      }
+    });
+
+    this.groupMessage = this.editingGroupId
+      ? (this.isArabic ? 'تم تحديث الفئة.' : 'Category updated.')
+      : (this.isArabic ? 'تمت إضافة الفئة.' : 'Category added.');
+  }
+
+  editGroup(group: EvaluationGroupRecord): void {
+    this.editingGroupId = group.id;
+    this.groupForm.setValue({
+      title: group.title,
+      description: group.description,
+      weight: group.weight,
+      specialization_id: group.specialization_id ?? ''
+    });
+    this.selectGroup(group.id);
+  }
+
+  deleteGroup(group: EvaluationGroupRecord): void {
+    if (!confirm(this.isArabic ? 'هل تريدين الحذف؟' : 'Are you sure?')) return;
+    this.data.deleteEvaluationGroup(group.id);
+    this.groupMessage = (this.isArabic ? 'تم الحذف بنجاح' : 'Deleted successfully');
+  }
+
+  duplicateGroup(group: EvaluationGroupRecord): void {
+    if (confirm(this.isArabic ? 'هل تريدين استنساخ هذا البند وجميع بنوده الفرعية؟' : 'Duplicate this evaluation group and its criteria?')) {
+      this.data.duplicateEvaluationGroup(group.id);
+      this.groupMessage = (this.isArabic ? 'تم النسخ بنجاح' : 'Duplicated successfully');
+    }
+  }
+
+  saveCriterion(): void {
+    this.criterionMessage = '';
+    const group = this.selectedGroup();
+
+    if (!group) {
+      this.criterionMessage = this.isArabic ? 'اختاري فئة تقييم أولًا.' : 'Select an evaluation category first.';
+      return;
+    }
+
+    if (this.criterionForm.invalid) {
+      this.criterionForm.markAllAsTouched();
+      this.criterionMessage = this.isArabic ? 'أكملي بيانات المعيار.' : 'Complete the criterion fields.';
+      return;
+    }
+
+    const value = this.criterionForm.getRawValue();
+    this.data.upsertEvaluationCriterion(group.id, {
+      id: this.editingCriterionId ?? undefined,
+      title: value.title.trim(),
+      weight: value.weight
+    }).subscribe({
+      next: (res) => {
+        if (res?.id) {
+          this.selectCriterion(res.id);
+          this.editingCriterionId = res.id;
+        }
+      }
+    });
+
+    this.criterionMessage = this.editingCriterionId
+      ? (this.isArabic ? 'تم تحديث المعيار.' : 'Criterion updated.')
+      : (this.isArabic ? 'تمت إضافة المعيار.' : 'Criterion added.');
+
+  }
+
+  editCriterion(group: EvaluationGroupRecord, criterion: EvaluationCriterionRecord): void {
+    this.selectGroup(group.id);
+    this.selectCriterion(criterion.id);
+    this.editingCriterionId = criterion.id;
+    this.criterionForm.setValue({
+      title: criterion.title,
+      weight: criterion.weight
+    });
+  }
+
+  deleteCriterion(group: EvaluationGroupRecord, criterion: EvaluationCriterionRecord): void {
+    const confirmed = confirm(this.isArabic
+      ? `هل تريدين حذف معيار "${criterion.title}"؟`
+      : `Delete criterion "${criterion.title}"?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.data.deleteEvaluationCriterion(group.id, criterion.id);
+    if (this.selectedCriterionId() === criterion.id) {
+      this.selectedCriterionId.set(0);
+    }
+  }
+
+  saveCriterionItems(): void {
+    this.itemMessage = '';
+    const group = this.selectedGroup();
+    const criterion = this.selectedCriterion();
+
+    if (!group || !criterion) {
+      this.itemMessage = this.isArabic ? 'اختاري فئة ومعيارًا قبل حفظ المقاييس الأربعة.' : 'Select a category and criterion before saving the four scales.';
+      return;
+    }
+
+    const invalid = this.itemForms.some((form) => form.invalid);
+
+    if (invalid) {
+      this.itemForms.forEach((form) => form.markAllAsTouched());
+      this.itemMessage = this.isArabic ? 'أدخلي أسماء المقاييس الأربعة لهذا المعيار.' : 'Enter the four scale names for this criterion.';
+      return;
+    }
+
+    const currentItems = this.sortedItems(criterion);
+
+    const items = this.itemForms.map((form, index) => {
+      const value = form.getRawValue();
+      const existing = currentItems[index];
+      const percentage = this.itemPercentages[index];
+
+      return {
+        id: existing?.id,
+        title: value.title.trim(),
+        description: value.description.trim(),
+        maxScore: this.itemScoreForPercentage(criterion, percentage)
+      };
+    });
+
+    this.data.replaceEvaluationItems(group.id, criterion.id, items).subscribe({
+      next: () => {
+        this.itemMessage = this.isArabic ? '✅ تم حفظ المقاييس الأربعة للمعيار بنجاح.' : '✅ The four criterion scales were saved successfully.';
+      },
+      error: (error) => {
+        console.error('Error saving scales:', error);
+        this.itemMessage = this.isArabic ? '❌ فشل حفظ المقاييس، يرجى التحقق من اتصال السيرفر.' : '❌ Failed to save scales. Check server status.';
+      }
+    });
+  }
+
+  private hydrateItemForms(): void {
+    const criterion = this.selectedCriterion();
+    const items = criterion ? this.sortedItems(criterion) : [];
+
+    this.itemForms.forEach((form, index) => {
+      const item = items[index];
+      form.reset({
+        title: item?.title ?? '',
+        description: item?.description ?? ''
+      });
+    });
+  }
+
+  /**
+   * 🚀 الدالة المحدثة مع جُمل طباعة للتأكد من عمل الزر في الـ Log
+   */
+  submitProjectEvaluation(): void {
+    console.log('🔘 تم الضغط على زر التقييم النهائي!');
+    const projectId = this.finalEvaluationForm.value.projectId;
+    console.log('المعرّف المستلم (projectId):', projectId);
+
+    this.evaluationSubmitMessage = '';
+
+    // تفتيش أمني: إذا لم يتم تحديد مشروع أو المعرّف 0، نبه المتصفح فوراً
+    if (!projectId || projectId === 0) {
+      console.warn('⚠️ تنبيه: لم يتم تمرير معرّف مشروع صالح (المعرّف الحالي 0 أو غير موجود).');
+      this.evaluationSubmitMessage = this.isArabic
+        ? 'الرجاء اختيار مشروع أولاً للتقييم.'
+        : 'Please select a project first to evaluate.';
+      return;
+    }
+
+    const payload = {
+      projectId: projectId,
+      score: this.totalMaxScore(),
+      notes: this.finalEvaluationForm.value.notes?.trim() || (this.isArabic ? 'تقييم تلقائي من النظام' : 'Automated evaluation note')
+    };
+
+    console.log('📦 البيانات المرسلة إلى السيرفر:', payload);
+
+    this.data.submitEvaluationToBackend(payload).subscribe({
+      next: (response) => {
+        console.log('✅ نجح الحفظ! رد السيرفر:', response);
+        this.evaluationSubmitMessage = this.isArabic
+          ? '🎉 تم إرسال وحفظ التقييم بنجاح في قاعدة البيانات!'
+          : '🎉 Evaluation successfully saved to the database!';
+        this.finalEvaluationForm.reset();
+      },
+      error: (error) => {
+        console.error('❌ خطأ من السيرفر أثناء حفظ التقييم:', error);
+        this.evaluationSubmitMessage = this.isArabic
+          ? '❌ فشل حفظ التقييم، يرجى التحقق من اتصال السيرفر.'
+          : '❌ Failed to save evaluation. Check server status.';
+      }
+    });
+  }
+}

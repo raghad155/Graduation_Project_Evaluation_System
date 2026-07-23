@@ -1,0 +1,149 @@
+<section class="management-page">
+  <header class="management-header">
+    <div>
+      <h1 class="page-title">{{ isArabic ? 'إدارة المشاريع' : 'Projects Management' }}</h1>
+      <p class="page-subtitle">
+        {{ isArabic ? 'إنشاء المشاريع وربطها بالمشرفين.' : 'Create projects and assign supervisors.' }}
+      </p>
+    </div>
+    <span class="status-pill">{{ projects().length }} {{ isArabic ? 'مشاريع' : 'projects' }}</span>
+  </header>
+
+  <div class="management-grid">
+    <article class="form-panel panel">
+      <h2>{{ editingId ? (isArabic ? 'تعديل مشروع' : 'Edit Project') : (isArabic ? 'إضافة مشروع' : 'Add Project') }}
+      </h2>
+      <form class="grid-form" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="field">
+          <span>{{ isArabic ? 'عنوان المشروع' : 'Project title' }}</span>
+          <input type="text" formControlName="title"
+            [placeholder]="isArabic ? 'نظام تقييم مشاريع التخرج' : 'Graduation Project Evaluation System'">
+          @if (form.controls.title.invalid && form.controls.title.touched) {
+          <small>{{ isArabic ? 'عنوان المشروع يجب أن يكون 3 أحرف على الأقل.' : 'Project title must be at least 3
+            characters.' }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'الوصف' : 'Description' }}</span>
+          <textarea formControlName="description"
+            [placeholder]="isArabic ? 'اكتبي وصفًا مختصرًا للمشروع' : 'Write a short project description'"></textarea>
+          @if (form.controls.description.invalid && form.controls.description.touched) {
+          <small>{{ isArabic ? 'الوصف يجب أن يكون 8 أحرف على الأقل.' : 'Description must be at least 8 characters.'
+            }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'التخصص (القسم)' : 'Specialization (Department)' }}</span>
+          <select formControlName="specialization_id">
+            <option value="" disabled selected>{{ isArabic ? 'اختر التخصص' : 'Select Specialization' }}</option>
+            @for (spec of specializations(); track spec.id) {
+            <option [value]="spec.id">{{ spec.name }}</option>
+            }
+          </select>
+          @if (form.controls.specialization_id.invalid && form.controls.specialization_id.touched) {
+          <small>{{ isArabic ? 'التخصص مطلوب.' : 'Specialization is required.' }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'المشرف' : 'Supervisor' }}</span>
+          <select formControlName="supervisor_id">
+            <option [value]="0">{{ isArabic ? 'بدون مشرف' : 'No supervisor' }}</option>
+            @for (supervisor of supervisors(); track supervisor.id) {
+            <option [value]="supervisor.id">{{ supervisor.fullName }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'اللجنة' : 'Committee' }}</span>
+          <select formControlName="committee_id">
+            <option [value]="0">{{ isArabic ? 'بدون لجنة' : 'No committee' }}</option>
+            @for (committee of committees(); track committee.id) {
+            <option [value]="committee.id">{{ committee.name }}</option>
+            }
+          </select>
+        </label>
+
+        @if (message) {
+        <p class="form-message" [class.success]="messageType === 'success'" [class.error]="messageType === 'error'">{{
+          message }}</p>
+        }
+
+        <div class="button-row">
+          <button class="primary-button" type="submit">
+            {{ editingId ? (isArabic ? 'تحديث المشروع' : 'Update Project') : (isArabic ? 'إضافة المشروع' : 'Add
+            Project') }}
+          </button>
+          <button class="secondary-button" type="button" (click)="resetForm()">{{ isArabic ? 'مسح' : 'Clear' }}</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="table-panel panel" [class.table-expanded]="tableExpanded">
+      <h2>{{ isArabic ? 'جدول المشاريع' : 'Projects Table' }}</h2>
+      <div class="table-toolbar">
+        <input type="search"
+          [placeholder]="isArabic ? 'بحث بالمشروع أو المشرف أو الوصف' : 'Search by project, supervisor, or description'"
+          [value]="query()" (input)="setQuery($any($event.target).value)">
+        <span class="table-meta">{{ filteredProjects().length }} {{ isArabic ? 'نتائج' : 'results' }}</span>
+        <button class="secondary-button table-view-button" type="button" (click)="tableExpanded = !tableExpanded">
+          {{ tableExpanded ? (isArabic ? 'تصغير' : 'Collapse') : (isArabic ? 'عرض' : 'View') }}
+        </button>
+      </div>
+
+      @if (filteredProjects().length) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>{{ isArabic ? 'العنوان' : 'Title' }}</th>
+              <th>{{ isArabic ? 'الوصف' : 'Description' }}</th>
+              <th>{{ isArabic ? 'المشرف' : 'Supervisor' }}</th>
+              <th>{{ isArabic ? 'اللجنة' : 'Committee' }}</th>
+              <th>{{ isArabic ? 'الإجراءات' : 'Actions' }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (project of filteredProjects(); track project.id) {
+            <tr>
+              <td>{{ project.title }}</td>
+              <td>{{ project.description }}</td>
+              <td>{{ project.supervisor_id ? supervisorName().get(project.supervisor_id) : (isArabic ? 'غير محدد' : 'Not
+                assigned') }}</td>
+              <td class="committee-cell">
+                @if (project.committee) {
+                <span class="status-pill">{{ project.committee?.name }}</span>
+                } @else {
+                <span class="text-muted" style="font-size:0.8rem">-</span>
+                }
+              </td>
+              <td>
+                <div class="button-row actions">
+                  <button class="action-button action-edit" type="button" (click)="edit(project)">
+                    <span class="action-icon" aria-hidden="true">&#9998;</span>
+                    <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
+                  </button>
+                  <button class="action-button action-delete" type="button" (click)="delete(project.id)">
+                    <span class="action-icon" aria-hidden="true">&#128465;</span>
+                    <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <div class="empty-state">
+        <strong>{{ isArabic ? 'لا توجد مشاريع' : 'No projects found' }}</strong>
+        <span>{{ isArabic ? 'أضيفي مشروعًا من النموذج أو غيّري البحث.' : 'Add a project from the form or change the
+          search.' }}</span>
+      </div>
+      }
+    </article>
+  </div>
+</section>

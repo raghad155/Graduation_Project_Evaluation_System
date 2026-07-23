@@ -1,0 +1,113 @@
+﻿<section class="management-page">
+  <header class="management-header">
+    <div>
+      <h1 class="page-title">{{ isArabic ? 'استيراد الطلاب من Excel' : 'Excel Student Import' }}</h1>
+      <p class="page-subtitle">
+        {{ isArabic ? 'ارفعي ملف Excel أو CSV وراجعي نتائج الاستيراد من Laravel.' :
+        'Upload an Excel or CSV file and review import results from Laravel.' }}
+      </p>
+    </div>
+    <div class="template-actions">
+      <button class="secondary-button" type="button" (click)="downloadStudentsTemplate()">
+        {{ isArabic ? 'تحميل قالب الطلاب' : 'Students Template' }}
+      </button>
+      <button class="secondary-button" type="button" (click)="downloadSupervisorsTemplate()">
+        {{ isArabic ? 'تحميل قالب المشرفين' : 'Supervisors Template' }}
+      </button>
+      <button class="secondary-button" type="button" (click)="downloadProjectsTemplate()">
+        {{ isArabic ? 'تحميل قالب المشاريع' : 'Projects Template' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="import-grid">
+    <article class="upload-panel panel">
+      <h2>{{ isArabic ? 'رفع ملف' : 'Upload File' }}</h2>
+      <div class="import-type-switch">
+        <button type="button" [class.active]="importType === 'students'" (click)="setImportType('students')">
+          {{ isArabic ? 'طلاب' : 'Students' }}
+        </button>
+        <button type="button" [class.active]="importType === 'supervisors'" (click)="setImportType('supervisors')">
+          {{ isArabic ? 'مشرفون' : 'Supervisors' }}
+        </button>
+        <button type="button" [class.active]="importType === 'projects'" (click)="setImportType('projects')">
+          {{ isArabic ? 'مشاريع' : 'Projects' }}
+        </button>
+      </div>
+
+      <label class="upload-box" [class.has-file]="selectedFile">
+        <input type="file" accept=".xlsx,.csv" (change)="selectFile($event)">
+        <span>{{ selectedFile ? (isArabic ? 'الملف جاهز' : 'File Ready') : (isArabic ? 'اختيار ملف Excel' : 'Choose
+          Excel File') }}</span>
+        <small>{{ fileMeta }}</small>
+      </label>
+
+      <ul class="hint-list">
+        <li>{{ isArabic ? 'استخدمي صفاً واحداً لكل طالب.' : 'Use one row per student.' }}</li>
+        <li>{{ isArabic ? 'حافظي على عدم تكرار الرقم الأكاديمي.' : 'Keep academic numbers unique.' }}</li>
+        <li>{{ isArabic ? 'الصيغ المقبولة: xlsx, csv.' : 'Accepted formats: xlsx, csv.' }}</li>
+      </ul>
+
+      @if (fileError) {
+      <p class="form-message error">{{ fileError }}</p>
+      }
+
+      <div class="button-row">
+        <button class="primary-button" type="button" [disabled]="uploading || !selectedFile" (click)="upload()">
+          @if (uploading) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>{{ isArabic ? 'جارِ الرفع...' : 'Uploading...' }}</span>
+          } @else {
+          <span>{{ importType === 'students' ? (isArabic ? 'استيراد الطلاب' : 'Import Students') : importType ===
+            'supervisors' ? (isArabic ? 'استيراد المشرفين' : 'Import Supervisors') : (isArabic ? 'استيراد المشاريع' :
+            'Import Projects') }}</span>
+          }
+        </button>
+        <button class="secondary-button" type="button" [disabled]="uploading || !selectedFile" (click)="clearFile()">
+          {{ isArabic ? 'مسح' : 'Clear' }}
+        </button>
+      </div>
+    </article>
+
+    <article class="table-panel panel" [class.table-expanded]="tableExpanded">
+      <h2>{{ isArabic ? 'نتائج الاستيراد' : 'Import Results' }}</h2>
+      @if (result) {
+      <div class="result-box" [class.error]="result.type === 'error'">
+        <strong>{{ resultMessage(result) }}</strong>
+        @if (result.details.length) {
+        <div class="table-toolbar compact-toolbar">
+          <span class="table-meta">{{ result.details.length }} {{ isArabic ? 'رسائل' : 'messages' }}</span>
+          <button class="secondary-button table-view-button" type="button" (click)="tableExpanded = !tableExpanded">
+            {{ tableExpanded ? (isArabic ? 'تصغير' : 'Collapse') : (isArabic ? 'عرض' : 'View') }}
+          </button>
+        </div>
+        <div class="table-wrap result-table-wrap">
+          <table class="data-table result-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>{{ isArabic ? 'الرسالة' : 'Message' }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (detail of result.details; track detail; let index = $index) {
+              <tr>
+                <td>{{ index + 1 }}</td>
+                <td>{{ resultDetail(detail) }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="empty-state">
+        <strong>{{ isArabic ? 'لا توجد نتيجة استيراد بعد' : 'No import result yet' }}</strong>
+        <span>{{ isArabic ? 'اختاري ملفاً واستورديه لعرض النجاح أو أخطاء التحقق.' : 'Select a file and import it to see
+          success or validation errors.' }}</span>
+      </div>
+      }
+    </article>
+  </div>
+</section>

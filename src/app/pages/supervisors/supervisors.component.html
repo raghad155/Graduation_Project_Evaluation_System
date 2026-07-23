@@ -1,0 +1,119 @@
+<section class="management-page">
+  <header class="management-header">
+    <div>
+      <h1 class="page-title">{{ isArabic ? 'إدارة المشرفين' : 'Supervisors Management' }}</h1>
+      <p class="page-subtitle">
+        {{ isArabic ? 'إضافة وتعديل وبحث ومراجعة بيانات المشرفين المرتبطين بالمشاريع.' : 'Create, edit, search, and
+        review supervisor records used by projects.' }}
+      </p>
+    </div>
+    <span class="status-pill">{{ supervisors().length }} {{ isArabic ? 'مشرفين' : 'supervisors' }}</span>
+  </header>
+
+  <div class="management-grid">
+    <article class="form-panel panel">
+      <h2>{{ editingId ? (isArabic ? 'تعديل مشرف' : 'Edit Supervisor') : (isArabic ? 'إضافة مشرف' : 'Add Supervisor') }}
+      </h2>
+      <form class="grid-form" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="field">
+          <span>{{ isArabic ? 'الاسم الكامل' : 'Full name' }}</span>
+          <input type="text" formControlName="fullName" [placeholder]="isArabic ? 'اسم المشرف' : 'Dr. Supervisor Name'">
+          @if (form.controls.fullName.invalid && form.controls.fullName.touched) {
+          <small>{{ isArabic ? 'الاسم يجب أن يكون 3 أحرف على الأقل.' : 'Full name must be at least 3 characters.'
+            }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'رقم الهاتف' : 'Phone number' }}</span>
+          <input type="tel" formControlName="phoneNumber" maxlength="9" placeholder="712345678">
+          @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+          <small>{{ isArabic ? 'يجب أن يكون 9 أرقام ويبدأ بـ 7 (مثال: 712345678)' : 'Must be 9 digits starting with 7
+            (e.g. 712345678)' }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'القسم' : 'Department' }}</span>
+          <select formControlName="department">
+            <option value="">{{ isArabic ? 'اختاري القسم' : 'Select department' }}</option>
+            @for (department of departments(); track department.value) {
+            <option [value]="department.value">{{ isArabic ? department.labelAr : department.labelEn }}</option>
+            }
+          </select>
+          @if (form.controls.department.invalid && form.controls.department.touched) {
+          <small>{{ isArabic ? 'القسم مطلوب.' : 'Department is required.' }}</small>
+          }
+        </label>
+
+        @if (message) {
+        <p class="form-message" [class.success]="messageType === 'success'" [class.error]="messageType === 'error'">{{
+          message }}</p>
+        }
+
+        <div class="button-row">
+          <button class="primary-button" type="submit">
+            {{ editingId ? (isArabic ? 'تحديث المشرف' : 'Update Supervisor') : (isArabic ? 'إضافة المشرف' : 'Add
+            Supervisor') }}
+          </button>
+          <button class="secondary-button" type="button" (click)="resetForm()">{{ isArabic ? 'مسح' : 'Clear' }}</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="table-panel panel" [class.table-expanded]="tableExpanded">
+      <h2>{{ isArabic ? 'جدول المشرفين' : 'Supervisors Table' }}</h2>
+      <div class="table-toolbar">
+        <input type="search"
+          [placeholder]="isArabic ? 'بحث بالاسم أو الهاتف أو القسم' : 'Search by name, phone, or department'"
+          [value]="query()" (input)="setQuery($any($event.target).value)">
+        <span class="table-meta">{{ filteredSupervisors().length }} {{ isArabic ? 'نتائج' : 'results' }}</span>
+        <button class="secondary-button table-view-button" type="button" (click)="tableExpanded = !tableExpanded">
+          {{ tableExpanded ? (isArabic ? 'تصغير' : 'Collapse') : (isArabic ? 'عرض' : 'View') }}
+        </button>
+      </div>
+
+      @if (filteredSupervisors().length) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>{{ isArabic ? 'الاسم' : 'Name' }}</th>
+              <th>{{ isArabic ? 'الهاتف' : 'Phone' }}</th>
+              <th>{{ isArabic ? 'القسم' : 'Department' }}</th>
+              <th>{{ isArabic ? 'الإجراءات' : 'Actions' }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (supervisor of filteredSupervisors(); track supervisor.id) {
+            <tr>
+              <td>{{ supervisor.fullName }}</td>
+              <td>{{ supervisor.phoneNumber }}</td>
+              <td>{{ departmentLabel(supervisor.department) }}</td>
+              <td>
+                <div class="button-row actions">
+                  <button class="action-button action-edit" type="button" (click)="edit(supervisor)">
+                    <span class="action-icon" aria-hidden="true">&#9998;</span>
+                    <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
+                  </button>
+                  <button class="action-button action-delete" type="button" (click)="delete(supervisor.id)">
+                    <span class="action-icon" aria-hidden="true">&#128465;</span>
+                    <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <div class="empty-state">
+        <strong>{{ isArabic ? 'لا يوجد مشرفون' : 'No supervisors found' }}</strong>
+        <span>{{ isArabic ? 'أضيفي مشرفًا من النموذج أو غيّري البحث.' : 'Add a supervisor from the form or change your
+          search.' }}</span>
+      </div>
+      }
+    </article>
+  </div>
+</section>

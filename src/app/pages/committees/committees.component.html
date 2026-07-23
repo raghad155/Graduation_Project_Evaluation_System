@@ -1,0 +1,161 @@
+<section class="management-page">
+    <header class="management-header">
+        <div>
+            <h1 class="page-title">{{ isArabic ? 'لجان المناقشة' : 'Committees Management' }}</h1>
+            <p class="page-subtitle">
+                {{ isArabic ? 'تكوين اللجان وإسناد الأعضاء والمناقشين لها.' : 'Create committees and assign members.' }}
+            </p>
+        </div>
+        <span class="status-pill">{{ committees().length }} {{ isArabic ? 'لجان' : 'committees' }}</span>
+    </header>
+
+    <div class="management-grid">
+        <article class="form-panel panel">
+            <h2>{{ editingId ? (isArabic ? 'تعديل لجنة' : 'Edit Committee') : (isArabic ? 'إضافة لجنة جديدة' : 'Add
+                Committee') }}</h2>
+            <form class="grid-form" [formGroup]="form" (ngSubmit)="submit()">
+                <label class="field">
+                    <span>{{ isArabic ? 'اسم اللجنة' : 'Committee Name' }} *</span>
+                    <input type="text" formControlName="name"
+                        [placeholder]="isArabic ? 'مثال: لجنة الذكاء الاصطناعي 1' : 'e.g., AI Committee A'">
+                    @if (form.controls.name.invalid && form.controls.name.touched) {
+                    <small class="field-error">{{ isArabic ? 'الاسم مطلوب للجنة' : 'Name is required' }}</small>
+                    }
+                </label>
+
+                <div class="field full-width">
+                    <span style="font-weight: 600; margin-bottom: 0.5rem; display: block;">{{ isArabic ? 'أعضاء اللجنة'
+                        : 'Committee Members' }}</span>
+                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 0.5rem;">
+                        {{ isArabic ? 'اختاري الأعضاء المسندين لهذه اللجنة من القائمة أدناه' : 'Select members for this
+                        committee' }}
+                    </p>
+
+                    <div class="users-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+                        @for (user of availableMembers(); track user.id) {
+                        <label class="checkbox-pill" [class.active]="isUserSelected(user.id)"
+                            style="display: flex; gap: 0.5rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" [checked]="isUserSelected(user.id)" (change)="toggleUser(user.id)">
+                            <span>{{ user.name || user['full_name'] }}</span>
+                        </label>
+                        }
+                    </div>
+                    @if (availableMembers().length === 0) {
+                    <p style="font-size: 0.8rem; color: #d97706;">{{ isArabic ? 'لا يوجد أعضاء متاحين حالياً.' : 'No
+                        available members.' }}</p>
+                    }
+                </div>
+
+                <div class="field full-width" style="margin-top: 1rem; position: relative;">
+                    <span style="font-weight: 600; margin-bottom: 0.5rem; display: block;">{{ isArabic ? 'مشاريع اللجنة'
+                        : 'Committee Projects' }}</span>
+                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 0.5rem;">
+                        {{ isArabic ? 'حددي المشاريع التي ستناقشها وتقيمها هذه اللجنة' : 'Select projects for this
+                        committee' }}
+                    </p>
+
+                    <div class="custom-dropdown" [class.open]="projectsDropdownOpen"
+                        style="position: relative; width: 100%;">
+                        <div class="dropdown-header" (click)="toggleProjectsDropdown()"
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; min-height: 48px; border: 1px solid var(--color-border); border-radius: var(--radius); background: #fbfdff; cursor: pointer; transition: all 0.2s;">
+                            <span style="font-weight: 600; color: var(--color-text);">
+                                {{ isArabic ? 'اختر المشاريع' : 'Select Projects' }}
+                            </span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="status-pill" style="margin: 0; min-height: 22px;">{{ selectedProjects.size
+                                    }}</span>
+                                <span style="font-size: 12px; transition: transform 0.2s; transform: rotate(0);"
+                                    [style.transform]="projectsDropdownOpen ? 'rotate(180deg)' : 'rotate(0)'">▼</span>
+                            </div>
+                        </div>
+
+                        @if (projectsDropdownOpen) {
+                        <div class="dropdown-panel"
+                            style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; max-height: 250px; overflow-y: auto; background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10; padding: 8px; display: flex; flex-direction: column; gap: 4px;">
+                            @for (project of availableProjects(); track project.id) {
+                            <label class="dropdown-item"
+                                style="display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 0.15s; user-select: none;"
+                                [style.background]="isProjectSelected(project.id) ? 'rgba(59, 130, 246, 0.05)' : 'transparent'">
+                                <input type="checkbox" [checked]="isProjectSelected(project.id)"
+                                    (change)="toggleProject(project.id, $event)">
+                                <span style="font-weight: 500;">{{ project.title }}</span>
+                            </label>
+                            }
+                            @if (availableProjects().length === 0) {
+                            <p
+                                style="padding: 10px; font-size: 0.85rem; color: var(--color-muted); text-align: center; margin: 0;">
+                                {{ isArabic ? 'لا توجد مشاريع متبقية.' : 'No available projects.' }}</p>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                @if (message) {
+                <p class="form-message" [class.success]="messageType === 'success'"
+                    [class.error]="messageType === 'error'">
+                    {{ message }}
+                </p>
+                }
+
+                <div class="button-row" style="margin-top: 1rem;">
+                    <button class="primary-button" type="submit">
+                        {{ editingId ? (isArabic ? 'تحديث' : 'Update') : (isArabic ? 'إضافة' : 'Add') }}
+                    </button>
+                    <button class="secondary-button" type="button" (click)="resetForm()">{{ isArabic ? 'مسح' : 'Clear'
+                        }}</button>
+                </div>
+            </form>
+        </article>
+
+        <article class="table-panel panel">
+            <h2>{{ isArabic ? 'قائمة اللجان' : 'Committees List' }}</h2>
+            <div class="table-toolbar">
+                <input type="search" [placeholder]="isArabic ? 'البحث عن لجنة...' : 'Search committees...'"
+                    [value]="query()" (input)="setQuery($any($event.target).value)">
+            </div>
+
+            @if (filteredCommittees().length) {
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>{{ isArabic ? 'اللجنة' : 'Committee' }}</th>
+                            <th>{{ isArabic ? 'عدد الأعضاء' : 'Members' }}</th>
+                            <th>{{ isArabic ? 'عدد المشاريع' : 'Projects' }}</th>
+                            <th>{{ isArabic ? 'الإجراءات' : 'Actions' }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (committee of filteredCommittees(); track committee.id) {
+                        <tr>
+                            <td style="font-weight: 600;">{{ committee.name }}</td>
+                            <td>{{ committee.users?.length || 0 }}</td>
+                            <td>{{ committee.projects?.length || 0 }}</td>
+                            <td>
+                                <div class="button-row actions">
+                                    <button class="action-button action-edit" type="button" (click)="edit(committee)">
+                                        <span>&#9998; {{ isArabic ? 'تعديل' : 'Edit' }}</span>
+                                    </button>
+                                    <button class="action-button action-delete" type="button"
+                                        (click)="delete(committee.id)">
+                                        <span>&#128465; {{ isArabic ? 'حذف' : 'Delete' }}</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            } @else {
+            <div class="empty-state">
+                <strong>{{ isArabic ? 'لا توجد لجان' : 'No committees found' }}</strong>
+                <span>{{ isArabic ? 'ابدئي بإنشاء لجنة جديدة لتنسيق المشاريع' : 'Start by creating a new committee'
+                    }}</span>
+            </div>
+            }
+        </article>
+    </div>
+</section>
