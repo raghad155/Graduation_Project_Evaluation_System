@@ -460,7 +460,9 @@ public function dashboardStats()
 {
     $projectsCount = Project::count();
     $studentsCount = Student::count();
-    $supervisorsCount = Supervisor::count();
+    $supervisorsCount = User::whereHas('roles', function($q) {
+        $q->where('name', 'supervisor');
+    })->count();
     $evaluationsCount = Evaluation::count();
 
     // حساب متوسط الدرجات
