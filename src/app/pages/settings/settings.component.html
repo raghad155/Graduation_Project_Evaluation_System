@@ -79,7 +79,8 @@
             project records in JSON format.' }}</p>
         </div>
         <button class="secondary-button" type="button" (click)="downloadBackup()">
-          ⬇️ {{ isArabic ? 'تنزيل النسخة الاحتياطية' : 'Download Backup' }}
+          <app-icon name="import" style="margin-right: 8px; margin-left: 8px;"></app-icon> {{ isArabic ? 'تنزيل النسخة
+          الاحتياطية' : 'Download Backup' }}
         </button>
       </div>
     </article>

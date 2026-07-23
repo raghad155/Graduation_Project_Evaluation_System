@@ -140,10 +140,10 @@
                         <td>
                             <div class="button-row actions">
                                 <button class="action-button action-edit" type="button" (click)="openEditForm(user)">
-                                    &#9998; {{ isArabic ? 'تعديل' : 'Edit' }}
+                                    <app-icon name="edit"></app-icon> {{ isArabic ? 'تعديل' : 'Edit' }}
                                 </button>
                                 <button class="action-button action-delete" type="button" (click)="deleteUser(user)">
-                                    &#128465; {{ isArabic ? 'حذف' : 'Delete' }}
+                                    <app-icon name="audit"></app-icon> {{ isArabic ? 'حذف' : 'Delete' }}
                                 </button>
                             </div>
                         </td>

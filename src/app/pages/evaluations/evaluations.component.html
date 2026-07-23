@@ -154,7 +154,7 @@
             </button>
             <div class="button-row actions">
               <button class="action-button action-edit" type="button" (click)="editGroup(group)">
-                <span class="action-icon" aria-hidden="true">&#9998;</span>
+                <span class="action-icon" aria-hidden="true"><app-icon name="edit"></app-icon></span>
                 <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
               </button>
               <button class="action-button action-duplicate" type="button" (click)="duplicateGroup(group)">
@@ -162,7 +162,7 @@
                 <span>{{ isArabic ? 'نسخ' : 'Duplicate' }}</span>
               </button>
               <button class="action-button action-delete" type="button" (click)="deleteGroup(group)">
-                <span class="action-icon" aria-hidden="true">&#128465;</span>
+                <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
                 <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
               </button>
             </div>
@@ -182,11 +182,11 @@
                 </button>
                 <div class="button-row actions">
                   <button class="action-button action-edit" type="button" (click)="editCriterion(group, criterion)">
-                    <span class="action-icon" aria-hidden="true">&#9998;</span>
+                    <span class="action-icon" aria-hidden="true"><app-icon name="edit"></app-icon></span>
                     <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
                   </button>
                   <button class="action-button action-delete" type="button" (click)="deleteCriterion(group, criterion)">
-                    <span class="action-icon" aria-hidden="true">&#128465;</span>
+                    <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
                     <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
                   </button>
                 </div>

@@ -24,11 +24,12 @@
   <div class="dashboard-grid">
     <!-- لوحة المراتب (أعلى وأقل المشاريع) -->
     <article class="panel readiness-panel">
-      <h2>🏆 {{ isArabic ? 'مراتب المشاريع' : 'Project Rankings' }}</h2>
+      <h2 style="display: flex; align-items: center; gap: 8px;"><app-icon name="trophy"></app-icon> {{ isArabic ? 'مراتب
+        المشاريع' : 'Project Rankings' }}</h2>
 
       @if (highestProject()) {
       <div class="ranking-card highest">
-        <div class="rank-icon">🌟</div>
+        <div class="rank-icon"><app-icon name="trophy"></app-icon></div>
         <div class="rank-details">
           <span class="rank-label">{{ isArabic ? 'الأعلى تقييماً' : 'Highest Rated' }}</span>
           <strong class="rank-title">{{ highestProject()?.project_title }}</strong>
@@ -39,7 +40,7 @@
 
       @if (lowestProject()) {
       <div class="ranking-card lowest" style="margin-top: 15px;">
-        <div class="rank-icon">📉</div>
+        <div class="rank-icon" style="color: #E74C3C;"><app-icon name="chart"></app-icon></div>
         <div class="rank-details">
           <span class="rank-label">{{ isArabic ? 'الأقل تقييماً' : 'Lowest Rated' }}</span>
           <strong class="rank-title">{{ lowestProject()?.project_title }}</strong>
@@ -55,7 +56,8 @@
 
     <!-- الرسم البياني للنتائج (Bar Chart) عبر CSS -->
     <article class="panel checklist-panel chart-panel">
-      <h2>📊 {{ isArabic ? 'مخطط درجات المشاريع' : 'Projects Score Chart' }}</h2>
+      <h2 style="display: flex; align-items: center; gap: 8px;"><app-icon name="chart"></app-icon> {{ isArabic ? 'مخطط
+        درجات المشاريع' : 'Projects Score Chart' }}</h2>
 
       <div class="chart-container">
         @if (chartData().length > 0) {

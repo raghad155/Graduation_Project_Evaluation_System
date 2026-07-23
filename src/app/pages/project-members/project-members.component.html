@@ -97,7 +97,7 @@
               <td>{{ joinedDate(member.joinedAt) }}</td>
               <td>
                 <button class="action-button action-delete" type="button" (click)="remove(member)">
-                  <span class="action-icon" aria-hidden="true">&#128465;</span>
+                  <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
                   <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
                 </button>
               </td>

@@ -4,11 +4,12 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { AppLanguage, AppTheme, PreferencesService } from '../../core/preferences.service';
 import { AdminDataService } from '../../core/admin-data.service';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, IconComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })

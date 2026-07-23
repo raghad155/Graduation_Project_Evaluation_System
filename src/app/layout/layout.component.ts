@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { IconComponent } from '../shared/components/icon/icon.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
@@ -36,7 +37,7 @@ const allRoles: UserRole[] = ['admin', 'supervisor', 'committee_chair', 'committ
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, IconComponent, RouterOutlet],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
