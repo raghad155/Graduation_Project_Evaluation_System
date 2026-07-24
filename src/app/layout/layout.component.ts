@@ -80,26 +80,29 @@ export class LayoutComponent {
   }
 
   get visibleLinks(): NavLink[] {
-    const role = this.user?.role;
+    const primaryRole = this.user?.role;
+    const allRoles = this.user?.roles || (primaryRole ? [primaryRole] : []);
     this.permissionState();
 
-    if (!role) {
+    if (!primaryRole && allRoles.length === 0) {
       return [];
     }
 
     return this.navLinks.filter((link) => {
-      if (!link.roles.includes(role)) {
-        return false;
-      }
-
-      return role === 'admin' || this.permissions.canAccess(role, link.route);
+      return allRoles.some(role => {
+        if (!link.roles.includes(role)) {
+          return false;
+        }
+        return role === 'admin' || this.permissions.canAccess(role, link.route);
+      });
     });
   }
 
   get showSettingsLink(): boolean {
-    const role = this.user?.role;
+    const primaryRole = this.user?.role;
+    const allRoles = this.user?.roles || (primaryRole ? [primaryRole] : []);
     this.permissionState();
-    return !!role && (role === 'admin' || this.permissions.canAccess(role, '/settings'));
+    return allRoles.some(role => role === 'admin' || this.permissions.canAccess(role, '/settings'));
   }
 
   get brandTitle(): string {
