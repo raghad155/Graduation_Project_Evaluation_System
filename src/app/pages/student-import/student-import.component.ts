@@ -197,6 +197,3 @@ export class StudentImportComponent {
     URL.revokeObjectURL(url);
   }
 }
-
-
-

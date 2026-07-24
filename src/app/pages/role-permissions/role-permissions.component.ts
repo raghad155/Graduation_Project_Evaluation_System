@@ -71,6 +71,3 @@ export class RolePermissionsComponent {
     this.permissions.resetRole(role);
   }
 }
-
-
-

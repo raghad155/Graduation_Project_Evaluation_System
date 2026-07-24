@@ -14,6 +14,3 @@ export class CommitteeMemberComponent {
     return this.preferences.state.language === 'ar';
   }
 }
-
-
-

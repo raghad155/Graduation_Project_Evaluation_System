@@ -1,6 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { NgClass, JsonPipe } from '@angular/common';
-import { IconComponent } from '../../shared/components/icon/icon.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AdminDataService } from '../../core/admin-data.service';
 import { ProjectRecord, StatCard, StudentRecord, SupervisorRecord, EvaluationGroupRecord } from '../../core/models';
@@ -9,7 +7,6 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgClass, JsonPipe, IconComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -99,6 +96,3 @@ export class DashboardComponent {
     ];
   });
 }
-
-
-

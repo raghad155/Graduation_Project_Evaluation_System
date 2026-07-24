@@ -1,141 +1,141 @@
-<section class="settings-page">
-  <header class="management-header">
-    <div>
-      <h1 class="page-title">{{ isArabic ? 'الإعدادات' : 'Settings' }}</h1>
-      <p class="page-subtitle">
-        {{ isArabic ? 'إدارة تفضيلات النظام ومعلومات الحساب وكلمة المرور.' : 'Manage system preferences, account
-        information, and password.' }}
-      </p>
-    </div>
-  </header>
-
-  <div class="settings-grid">
-    <article class="settings-panel panel">
-      <h2>{{ isArabic ? 'المظهر واللغة' : 'Appearance and Language' }}</h2>
-
-      <div class="setting-row">
-        <div>
-          <strong>{{ isArabic ? 'اللغة' : 'Language' }}</strong>
-          <p>{{ isArabic ? 'اختاري لغة عرض النظام.' : 'Choose the interface language.' }}</p>
-        </div>
-        <div class="segmented-control" role="group" [attr.aria-label]="isArabic ? 'اللغة' : 'Language'">
-          <button type="button" [class.active]="preferences.state.language === 'en'"
-            (click)="setLanguage('en')">English</button>
-          <button type="button" [class.active]="preferences.state.language === 'ar'"
-            (click)="setLanguage('ar')">العربية</button>
-        </div>
-      </div>
-
-      <div class="setting-row">
-        <div>
-          <strong>{{ isArabic ? 'الوضع' : 'Theme' }}</strong>
-          <p>{{ isArabic ? 'التبديل بين الوضع الفاتح والداكن.' : 'Switch between light and dark mode.' }}</p>
-        </div>
-        <div class="segmented-control" role="group" [attr.aria-label]="isArabic ? 'الوضع' : 'Theme'">
-          <button type="button" [class.active]="preferences.state.theme === 'light'" (click)="setTheme('light')">
-            {{ isArabic ? 'فاتح' : 'Light' }}
-          </button>
-          <button type="button" [class.active]="preferences.state.theme === 'dark'" (click)="setTheme('dark')">
-            {{ isArabic ? 'داكن' : 'Dark' }}
-          </button>
-        </div>
-      </div>
-    </article>
-
-    <article class="settings-panel panel">
-      <h2>{{ isArabic ? 'معلومات الحساب' : 'Account Information' }}</h2>
-
-      <div class="account-card">
-        <span>{{ user?.name?.slice(0, 1) || 'U' }}</span>
-        <div>
-          <strong>{{ user?.name || '-' }}</strong>
-          <small>{{ translatedRole }}</small>
-        </div>
-      </div>
-
-      <dl class="account-list">
-        <div>
-          <dt>{{ isArabic ? 'اسم المستخدم' : 'Username' }}</dt>
-          <dd>{{ user?.username || '-' }}</dd>
-        </div>
-        <div>
-          <dt>{{ isArabic ? 'البريد الإلكتروني' : 'Email' }}</dt>
-          <dd>{{ user?.email || '-' }}</dd>
-        </div>
-        <div>
-          <dt>{{ isArabic ? 'الدور' : 'Role' }}</dt>
-          <dd>{{ translatedRole }}</dd>
-        </div>
-      </dl>
-    </article>
-
-    @if (user?.role === 'admin' || user?.role === 'committee_chair') {
-    <article class="settings-panel panel backup-panel">
-      <h2>{{ isArabic ? 'نسخ احتياطي للبيانات' : 'Data Backup' }}</h2>
-      <div class="setting-row" style="display: flex; flex-direction: column; align-items: flex-start; gap: 15px;">
-        <div>
-          <strong>{{ isArabic ? 'تصدير نسخة كاملة للنظام' : 'Export Full System Snapshot' }}</strong>
-          <p>{{ isArabic ? 'تنزيل أرشيف محمول لجميع سجلات المشاريع بصيغة JSON' : 'Download a portable archive of all
-            project records in JSON format.' }}</p>
-        </div>
-        <button class="secondary-button" type="button" (click)="downloadBackup()">
-          <app-icon name="import" style="margin-right: 8px; margin-left: 8px;"></app-icon> {{ isArabic ? 'تنزيل النسخة
-          الاحتياطية' : 'Download Backup' }}
-        </button>
-      </div>
-    </article>
-    }
-
-    <article class="settings-panel panel password-panel">
-      <h2>{{ isArabic ? 'تغيير كلمة المرور' : 'Change Password' }}</h2>
-
-      <form class="grid-form" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-        <label class="field">
-          <span>{{ isArabic ? 'كلمة المرور الحالية' : 'Current password' }}</span>
-          <input type="password" formControlName="currentPassword" autocomplete="current-password">
-          @if (passwordForm.controls.currentPassword.invalid && passwordForm.controls.currentPassword.touched) {
-          <small>{{ isArabic ? 'كلمة المرور الحالية مطلوبة.' : 'Current password is required.' }}</small>
-          }
-        </label>
-
-        <label class="field">
-          <span>{{ isArabic ? 'كلمة المرور الجديدة' : 'New password' }}</span>
-          <input type="password" formControlName="newPassword" autocomplete="new-password">
-          @if (passwordForm.controls.newPassword.invalid && passwordForm.controls.newPassword.touched) {
-          <small>{{ isArabic ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.' : 'Password must be at least 6 characters.'
-            }}</small>
-          }
-        </label>
-
-        <div class="password-strength">
-          <div>
-            <span [style.width.%]="passwordStrengthPercent"></span>
-          </div>
-          <small>{{ isArabic ? 'قوة كلمة المرور' : 'Password strength' }}: {{ passwordStrengthLabel }}</small>
-        </div>
-
-        <label class="field">
-          <span>{{ isArabic ? 'تأكيد كلمة المرور' : 'Confirm password' }}</span>
-          <input type="password" formControlName="confirmPassword" autocomplete="new-password">
-          @if (passwordForm.controls.confirmPassword.invalid && passwordForm.controls.confirmPassword.touched) {
-          <small>{{ isArabic ? 'تأكيد كلمة المرور مطلوب.' : 'Password confirmation is required.' }}</small>
-          }
-        </label>
-
-        @if (passwordMessage) {
-        <p class="form-message" [class.success]="passwordMessageType === 'success'"
-          [class.error]="passwordMessageType === 'error'">{{ passwordMessage }}</p>
-        }
-
-        <button class="primary-button" type="submit" [disabled]="savingPassword">
-          @if (savingPassword) {
-          <span class="spinner" aria-hidden="true"></span>
-          <span>{{ isArabic ? 'جاري الحفظ...' : 'Saving...' }}</span>
-          } @else {
-          <span>{{ isArabic ? 'تغيير كلمة المرور' : 'Change Password' }}</span>
-          }
-        </button>
-      </form>
-    </article>
-  </div>
+<section class="settings-page">
+  <header class="management-header">
+    <div>
+      <h1 class="page-title">{{ isArabic ? 'الإعدادات' : 'Settings' }}</h1>
+      <p class="page-subtitle">
+        {{ isArabic ? 'إدارة تفضيلات النظام ومعلومات الحساب وكلمة المرور.' : 'Manage system preferences, account
+        information, and password.' }}
+      </p>
+    </div>
+  </header>
+
+  <div class="settings-grid">
+    <article class="settings-panel panel">
+      <h2>{{ isArabic ? 'المظهر واللغة' : 'Appearance and Language' }}</h2>
+
+      <div class="setting-row">
+        <div>
+          <strong>{{ isArabic ? 'اللغة' : 'Language' }}</strong>
+          <p>{{ isArabic ? 'اختاري لغة عرض النظام.' : 'Choose the interface language.' }}</p>
+        </div>
+        <div class="segmented-control" role="group" [attr.aria-label]="isArabic ? 'اللغة' : 'Language'">
+          <button type="button" [class.active]="preferences.state.language === 'en'"
+            (click)="setLanguage('en')">English</button>
+          <button type="button" [class.active]="preferences.state.language === 'ar'"
+            (click)="setLanguage('ar')">العربية</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <strong>{{ isArabic ? 'الوضع' : 'Theme' }}</strong>
+          <p>{{ isArabic ? 'التبديل بين الوضع الفاتح والداكن.' : 'Switch between light and dark mode.' }}</p>
+        </div>
+        <div class="segmented-control" role="group" [attr.aria-label]="isArabic ? 'الوضع' : 'Theme'">
+          <button type="button" [class.active]="preferences.state.theme === 'light'" (click)="setTheme('light')">
+            {{ isArabic ? 'فاتح' : 'Light' }}
+          </button>
+          <button type="button" [class.active]="preferences.state.theme === 'dark'" (click)="setTheme('dark')">
+            {{ isArabic ? 'داكن' : 'Dark' }}
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <article class="settings-panel panel">
+      <h2>{{ isArabic ? 'معلومات الحساب' : 'Account Information' }}</h2>
+
+      <div class="account-card">
+        <span>{{ user?.name?.slice(0, 1) || 'U' }}</span>
+        <div>
+          <strong>{{ user?.name || '-' }}</strong>
+          <small>{{ translatedRole }}</small>
+        </div>
+      </div>
+
+      <dl class="account-list">
+        <div>
+          <dt>{{ isArabic ? 'اسم المستخدم' : 'Username' }}</dt>
+          <dd>{{ user?.username || '-' }}</dd>
+        </div>
+        <div>
+          <dt>{{ isArabic ? 'البريد الإلكتروني' : 'Email' }}</dt>
+          <dd>{{ user?.email || '-' }}</dd>
+        </div>
+        <div>
+          <dt>{{ isArabic ? 'الدور' : 'Role' }}</dt>
+          <dd>{{ translatedRole }}</dd>
+        </div>
+      </dl>
+    </article>
+
+    @if (user?.role === 'admin' || user?.role === 'committee_chair') {
+    <article class="settings-panel panel backup-panel">
+      <h2>{{ isArabic ? 'نسخ احتياطي للبيانات' : 'Data Backup' }}</h2>
+      <div class="setting-row" style="display: flex; flex-direction: column; align-items: flex-start; gap: 15px;">
+        <div>
+          <strong>{{ isArabic ? 'تصدير نسخة كاملة للنظام' : 'Export Full System Snapshot' }}</strong>
+          <p>{{ isArabic ? 'تنزيل أرشيف محمول لجميع سجلات المشاريع بصيغة JSON' : 'Download a portable archive of all
+            project records in JSON format.' }}</p>
+        </div>
+        <button class="secondary-button" type="button" (click)="downloadBackup()">
+          <app-icon name="import" style="margin-right: 8px; margin-left: 8px;"></app-icon> {{ isArabic ? 'تنزيل النسخة
+          الاحتياطية' : 'Download Backup' }}
+        </button>
+      </div>
+    </article>
+    }
+
+    <article class="settings-panel panel password-panel">
+      <h2>{{ isArabic ? 'تغيير كلمة المرور' : 'Change Password' }}</h2>
+
+      <form class="grid-form" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <label class="field">
+          <span>{{ isArabic ? 'كلمة المرور الحالية' : 'Current password' }}</span>
+          <input type="password" formControlName="currentPassword" autocomplete="current-password">
+          @if (passwordForm.controls.currentPassword.invalid && passwordForm.controls.currentPassword.touched) {
+          <small>{{ isArabic ? 'كلمة المرور الحالية مطلوبة.' : 'Current password is required.' }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'كلمة المرور الجديدة' : 'New password' }}</span>
+          <input type="password" formControlName="newPassword" autocomplete="new-password">
+          @if (passwordForm.controls.newPassword.invalid && passwordForm.controls.newPassword.touched) {
+          <small>{{ isArabic ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.' : 'Password must be at least 6 characters.'
+            }}</small>
+          }
+        </label>
+
+        <div class="password-strength">
+          <div>
+            <span [style.width.%]="passwordStrengthPercent"></span>
+          </div>
+          <small>{{ isArabic ? 'قوة كلمة المرور' : 'Password strength' }}: {{ passwordStrengthLabel }}</small>
+        </div>
+
+        <label class="field">
+          <span>{{ isArabic ? 'تأكيد كلمة المرور' : 'Confirm password' }}</span>
+          <input type="password" formControlName="confirmPassword" autocomplete="new-password">
+          @if (passwordForm.controls.confirmPassword.invalid && passwordForm.controls.confirmPassword.touched) {
+          <small>{{ isArabic ? 'تأكيد كلمة المرور مطلوب.' : 'Password confirmation is required.' }}</small>
+          }
+        </label>
+
+        @if (passwordMessage) {
+        <p class="form-message" [class.success]="passwordMessageType === 'success'"
+          [class.error]="passwordMessageType === 'error'">{{ passwordMessage }}</p>
+        }
+
+        <button class="primary-button" type="submit" [disabled]="savingPassword">
+          @if (savingPassword) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>{{ isArabic ? 'جاري الحفظ...' : 'Saving...' }}</span>
+          } @else {
+          <span>{{ isArabic ? 'تغيير كلمة المرور' : 'Change Password' }}</span>
+          }
+        </button>
+      </form>
+    </article>
+  </div>
 </section>

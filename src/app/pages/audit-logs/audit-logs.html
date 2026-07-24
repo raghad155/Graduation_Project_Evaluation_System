@@ -1,46 +1,46 @@
-<section class="audit-page">
-    <header class="management-header">
-        <div>
-            <h1 class="page-title">{{ isArabic ? 'سجلات النظام والتدقيق' : 'System Audit Trails' }}</h1>
-            <p class="page-subtitle">
-                {{ isArabic ? 'مراقبة كافة الحركات الدقيقة وتعديلات الدرجات في مسار زمني.' : 'Monitor all micro-actions
-                and grade modifications in a timeline.' }}
-            </p>
-        </div>
-    </header>
-
-    <div class="audit-content">
-        @if (loading) {
-        <div class="loading-state">
-            <span class="spinner"></span> {{ isArabic ? 'جاري تحميل السجلات...' : 'Loading Logs...' }}
-        </div>
-        } @else if (errorMessage) {
-        <div class="empty-state error-state">
-            <p style="color: red;">Error: {{ errorMessage }}</p>
-        </div>
-        } @else if (logs.length === 0) {
-        <div class="empty-state">
-            <p>{{ isArabic ? 'لا توجد سجلات بعد.' : 'No audit logs found yet.' }}</p>
-        </div>
-        } @else {
-        <ul class="timeline">
-            @for (log of logs; track log.id) {
-            <li class="timeline-item">
-                <div class="timeline-date">
-                    <span class="date">{{ log.created_at | date:'yyyy-MM-dd' }}</span>
-                    <span class="time">{{ log.created_at | date:'HH:mm:ss' }}</span>
-                </div>
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                    <h3>
-                        <span class="action-badge" [ngClass]="log.action">{{ log.action }}</span>
-                        - {{ log.user ? log.user.name : (isArabic ? 'مجهول' : 'Unknown') }}
-                    </h3>
-                    <p>{{ log.details }}</p>
-                </div>
-            </li>
-            }
-        </ul>
-        }
-    </div>
-</section>
+<section class="audit-page">
+    <header class="management-header">
+        <div>
+            <h1 class="page-title">{{ isArabic ? 'سجلات النظام والتدقيق' : 'System Audit Trails' }}</h1>
+            <p class="page-subtitle">
+                {{ isArabic ? 'مراقبة كافة الحركات الدقيقة وتعديلات الدرجات في مسار زمني.' : 'Monitor all micro-actions
+                and grade modifications in a timeline.' }}
+            </p>
+        </div>
+    </header>
+
+    <div class="audit-content">
+        @if (loading) {
+        <div class="loading-state">
+            <span class="spinner"></span> {{ isArabic ? 'جاري تحميل السجلات...' : 'Loading Logs...' }}
+        </div>
+        } @else if (errorMessage) {
+        <div class="empty-state error-state">
+            <p style="color: red;">Error: {{ errorMessage }}</p>
+        </div>
+        } @else if (logs.length === 0) {
+        <div class="empty-state">
+            <p>{{ isArabic ? 'لا توجد سجلات بعد.' : 'No audit logs found yet.' }}</p>
+        </div>
+        } @else {
+        <ul class="timeline">
+            @for (log of logs; track log.id) {
+            <li class="timeline-item">
+                <div class="timeline-date">
+                    <span class="date">{{ log.created_at | date:'yyyy-MM-dd' }}</span>
+                    <span class="time">{{ log.created_at | date:'HH:mm:ss' }}</span>
+                </div>
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <h3>
+                        <span class="action-badge" [ngClass]="log.action">{{ log.action }}</span>
+                        - {{ log.user ? log.user.name : (isArabic ? 'مجهول' : 'Unknown') }}
+                    </h3>
+                    <p>{{ log.details }}</p>
+                </div>
+            </li>
+            }
+        </ul>
+        }
+    </div>
+</section>

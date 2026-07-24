@@ -1,83 +1,83 @@
-<section class="dashboard-page">
-  <header class="page-header">
-    <div>
-      <h1 class="page-title">{{ isArabic ? 'لوحة تحكم الإحصائيات' : 'Analytics Dashboard' }}</h1>
-      <p class="page-subtitle">
-        {{ isArabic ? 'نظرة شاملة ومتقدمة على مجريات تقييم المشاريع، مدعومة بالبيانات الفورية.' : 'Advanced overview of
-        project evaluations, powered by live data.' }}
-      </p>
-    </div>
-  </header>
-
-  <!-- بطاقات الإحصائيات العلوية -->
-  <div class="stats-grid">
-    @for (stat of stats(); track stat.title) {
-    <article class="stat-card panel" [class.accent]="stat.tone === 'accent'" [class.warning]="stat.tone === 'warning'"
-      [class.danger]="stat.tone === 'danger'">
-      <span>{{ stat.title }}</span>
-      <strong>{{ stat.value }}</strong>
-      <small>{{ stat.note }}</small>
-    </article>
-    }
-  </div>
-
-  <div class="dashboard-grid">
-    <!-- لوحة المراتب (أعلى وأقل المشاريع) -->
-    <article class="panel readiness-panel">
-      <h2 style="display: flex; align-items: center; gap: 8px;"><app-icon name="trophy"></app-icon> {{ isArabic ? 'مراتب
-        المشاريع' : 'Project Rankings' }}</h2>
-
-      @if (highestProject()) {
-      <div class="ranking-card highest">
-        <div class="rank-icon"><app-icon name="trophy"></app-icon></div>
-        <div class="rank-details">
-          <span class="rank-label">{{ isArabic ? 'الأعلى تقييماً' : 'Highest Rated' }}</span>
-          <strong class="rank-title">{{ highestProject()?.project_title }}</strong>
-          <span class="rank-score">{{ highestProject()?.average_score }} %</span>
-        </div>
-      </div>
-      }
-
-      @if (lowestProject()) {
-      <div class="ranking-card lowest" style="margin-top: 15px;">
-        <div class="rank-icon" style="color: #E74C3C;"><app-icon name="chart"></app-icon></div>
-        <div class="rank-details">
-          <span class="rank-label">{{ isArabic ? 'الأقل تقييماً' : 'Lowest Rated' }}</span>
-          <strong class="rank-title">{{ lowestProject()?.project_title }}</strong>
-          <span class="rank-score">{{ lowestProject()?.average_score }} %</span>
-        </div>
-      </div>
-      }
-
-      @if (!highestProject() && !lowestProject()) {
-      <p style="color: #666;">{{ isArabic ? 'لا يوجد بيانات كافية بعد.' : 'No data available yet.' }}</p>
-      }
-    </article>
-
-    <!-- الرسم البياني للنتائج (Bar Chart) عبر CSS -->
-    <article class="panel checklist-panel chart-panel">
-      <h2 style="display: flex; align-items: center; gap: 8px;"><app-icon name="chart"></app-icon> {{ isArabic ? 'مخطط
-        درجات المشاريع' : 'Projects Score Chart' }}</h2>
-
-      <div class="chart-container">
-        @if (chartData().length > 0) {
-        @for (item of chartData(); track item.title) {
-        <div class="chart-bar-wrapper">
-          <div class="chart-info">
-            <span class="chart-title" [title]="item.title">{{ item.title }}</span>
-            <span class="chart-value">{{ item.score }}%</span>
-          </div>
-          <div class="chart-track">
-            <div class="chart-fill" [style.width.%]="item.score"></div>
-          </div>
-        </div>
-        }
-        } @else {
-        <p style="color: #666; text-align: center; margin-top: 30px;">
-          {{ isArabic ? 'الرسم البياني غير متاح حالياً.' : 'Chart not available yet.' }}
-        </p>
-        }
-      </div>
-    </article>
-  </div>
+<section class="dashboard-page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">{{ isArabic ? 'لوحة تحكم الإحصائيات' : 'Analytics Dashboard' }}</h1>
+      <p class="page-subtitle">
+        {{ isArabic ? 'نظرة شاملة ومتقدمة على مجريات تقييم المشاريع، مدعومة بالبيانات الفورية.' : 'Advanced overview of
+        project evaluations, powered by live data.' }}
+      </p>
+    </div>
+  </header>
+
+  <!-- بطاقات الإحصائيات العلوية -->
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.title) {
+    <article class="stat-card panel" [class.accent]="stat.tone === 'accent'" [class.warning]="stat.tone === 'warning'"
+      [class.danger]="stat.tone === 'danger'">
+      <span>{{ stat.title }}</span>
+      <strong>{{ stat.value }}</strong>
+      <small>{{ stat.note }}</small>
+    </article>
+    }
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- لوحة المراتب (أعلى وأقل المشاريع) -->
+    <article class="panel readiness-panel">
+      <h2 style="display: flex; align-items: center; gap: 8px;"><app-icon name="trophy"></app-icon> {{ isArabic ? 'مراتب
+        المشاريع' : 'Project Rankings' }}</h2>
+
+      @if (highestProject()) {
+      <div class="ranking-card highest">
+        <div class="rank-icon"><app-icon name="trophy"></app-icon></div>
+        <div class="rank-details">
+          <span class="rank-label">{{ isArabic ? 'الأعلى تقييماً' : 'Highest Rated' }}</span>
+          <strong class="rank-title">{{ highestProject()?.project_title }}</strong>
+          <span class="rank-score">{{ highestProject()?.average_score }} %</span>
+        </div>
+      </div>
+      }
+
+      @if (lowestProject()) {
+      <div class="ranking-card lowest" style="margin-top: 15px;">
+        <div class="rank-icon" style="color: #E74C3C;"><app-icon name="chart"></app-icon></div>
+        <div class="rank-details">
+          <span class="rank-label">{{ isArabic ? 'الأقل تقييماً' : 'Lowest Rated' }}</span>
+          <strong class="rank-title">{{ lowestProject()?.project_title }}</strong>
+          <span class="rank-score">{{ lowestProject()?.average_score }} %</span>
+        </div>
+      </div>
+      }
+
+      @if (!highestProject() && !lowestProject()) {
+      <p style="color: #666;">{{ isArabic ? 'لا يوجد بيانات كافية بعد.' : 'No data available yet.' }}</p>
+      }
+    </article>
+
+    <!-- الرسم البياني للنتائج (Bar Chart) عبر CSS -->
+    <article class="panel checklist-panel chart-panel">
+      <h2 style="display: flex; align-items: center; gap: 8px;"><app-icon name="chart"></app-icon> {{ isArabic ? 'مخطط
+        درجات المشاريع' : 'Projects Score Chart' }}</h2>
+
+      <div class="chart-container">
+        @if (chartData().length > 0) {
+        @for (item of chartData(); track item.title) {
+        <div class="chart-bar-wrapper">
+          <div class="chart-info">
+            <span class="chart-title" [title]="item.title">{{ item.title }}</span>
+            <span class="chart-value">{{ item.score }}%</span>
+          </div>
+          <div class="chart-track">
+            <div class="chart-fill" [style.width.%]="item.score"></div>
+          </div>
+        </div>
+        }
+        } @else {
+        <p style="color: #666; text-align: center; margin-top: 30px;">
+          {{ isArabic ? 'الرسم البياني غير متاح حالياً.' : 'Chart not available yet.' }}
+        </p>
+        }
+      </div>
+    </article>
+  </div>
 </section>

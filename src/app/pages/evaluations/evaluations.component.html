@@ -1,268 +1,268 @@
-<section class="management-page evaluations-page">
-  <header class="management-header">
-    <div>
-      <h1 class="page-title">{{ isArabic ? 'إدارة التقييمات' : 'Evaluations Management' }}</h1>
-      <p class="page-subtitle">
-        {{ isArabic ? 'أنشئي التقييمات على شكل فئات، وكل فئة تحتوي معايير ومقاييس مع أوزان ودرجات.' : 'Build evaluations
-        as categories. Each category contains criteria and scales with weights and scores.' }}
-      </p>
-    </div>
-    <span class="status-pill">{{ totalGroupWeight() }}% {{ isArabic ? 'وزن الفئات' : 'category weight' }}</span>
-  </header>
-
-  <div class="evaluation-builder">
-    <article class="panel builder-panel">
-      <div class="step-header">
-        <span class="step-badge">{{ isArabic ? 'الخطوة 1' : 'Step 1' }}</span>
-        <h2>{{ editingGroupId ? (isArabic ? 'تعديل فئة' : 'Edit Category') : (isArabic ? 'إضافة فئة تقييم' : 'Add
-          Evaluation Category') }}</h2>
-        <p class="step-desc">{{ isArabic ? 'أنشئي فئة التقييم الرئيسية أولاً (مثال: المناقشة والعرض).' : 'Create the
-          main evaluation category first.' }}</p>
-      </div>
-      <form class="grid-form" [formGroup]="groupForm" (ngSubmit)="saveGroup()">
-        <label class="field">
-          <span>{{ isArabic ? 'اسم الفئة' : 'Category name' }}</span>
-          <input formControlName="title"
-            [placeholder]="isArabic ? 'مثل: العرض والمناقشة' : 'Example: Presentation and discussion'">
-        </label>
-        <label class="field">
-          <span>{{ isArabic ? 'الوصف' : 'Description' }}</span>
-          <textarea formControlName="description"
-            [placeholder]="isArabic ? 'وصف مختصر للفئة' : 'Short category description'"></textarea>
-        </label>
-        <label class="field">
-          <span>{{ isArabic ? 'وزن الفئة (%)' : 'Category weight (%)' }}</span>
-          <input type="number" formControlName="weight" min="1" max="100">
-        </label>
-        @if (groupMessage) {
-        <p class="form-message success">{{ groupMessage }}</p>
-        }
-        <button class="primary-button" type="submit">{{ editingGroupId ? (isArabic ? 'تحديث الفئة' : 'Update Category')
-          : (isArabic ? 'إضافة الفئة' : 'Add Category') }}</button>
-      </form>
-    </article>
-
-    <article class="panel builder-panel" [class.panel-disabled]="!groups().length">
-      <div class="step-header">
-        <span class="step-badge">{{ isArabic ? 'الخطوة 2' : 'Step 2' }}</span>
-        <h2>{{ editingCriterionId ? (isArabic ? 'تعديل معيار' : 'Edit Criterion') : (isArabic ? 'إضافة معيار' : 'Add
-          Criterion') }}</h2>
-        <p class="step-desc">{{ isArabic ? 'اختاري الفئة بالأعلى ثم أضيفي لها المعايير (مثال: جودة الفكرة).' : 'Select
-          the category above and add criteria to it.' }}</p>
-      </div>
-      <form class="grid-form" [formGroup]="criterionForm" (ngSubmit)="saveCriterion()">
-        <label class="field">
-          <span>{{ isArabic ? 'اسم الفئة' : 'Category name' }}</span>
-          <select [value]="selectedGroupId()" (change)="selectGroup($any($event.target).value)">
-            <option [value]="0">{{ isArabic ? 'اختاري فئة' : 'Select category' }}</option>
-            @for (group of groups(); track group.id) {
-            <option [value]="group.id">{{ group.title }}</option>
-            }
-          </select>
-        </label>
-        <label class="field">
-          <span>{{ isArabic ? 'اسم المعيار' : 'Criterion name' }}</span>
-          <input formControlName="title" [placeholder]="isArabic ? 'مثل: جودة الفكرة' : 'Example: Idea quality'">
-        </label>
-        <label class="field">
-          <span>{{ isArabic ? 'وزن المعيار (%)' : 'Criterion weight (%)' }}</span>
-          <input type="number" formControlName="weight" min="1" max="100">
-        </label>
-        @if (criterionMessage) {
-        <p class="form-message" [class.error]="!selectedGroup()" [class.success]="selectedGroup()">{{ criterionMessage
-          }}</p>
-        }
-        <button class="primary-button" type="submit" [disabled]="!selectedGroupId()">{{ editingCriterionId ? (isArabic ?
-          'تحديث المعيار' : 'Update Criterion') : (isArabic ? 'إضافة المعيار' : 'Add Criterion') }}</button>
-      </form>
-    </article>
-
-    <article class="panel builder-panel" [class.panel-disabled]="!selectedCriterionId()">
-      <div class="step-header">
-        <span class="step-badge">{{ isArabic ? 'الخطوة 3' : 'Step 3' }}</span>
-        <h2>{{ isArabic ? 'مقاييس المعيار الأربعة' : 'Four Criterion Scales' }}</h2>
-        <p class="step-desc">{{ isArabic ? 'حددي المعيار، ثم اكتبي تفاصيل المستويات الأربعة للتقييم له.' : 'Select the
-          criterion, then write details for its 4 levels.' }}</p>
-      </div>
-      <form class="grid-form" (ngSubmit)="$event.preventDefault(); saveCriterionItems()">
-        <label class="field" style="flex: 0 0 auto;">
-          <span>{{ isArabic ? 'المعيار المحدد' : 'Selected criterion' }}</span>
-          <select [value]="selectedCriterionId()" (change)="selectCriterion($any($event.target).value)">
-            <option [value]="0">{{ isArabic ? 'اختاري معيارًا' : 'Select criterion' }}</option>
-            @if (selectedGroup(); as group) {
-            @for (criterion of group.criteria; track criterion.id) {
-            <option [value]="criterion.id">{{ criterion.title }}</option>
-            }
-            }
-          </select>
-        </label>
-
-        <div class="scales-scroll-area" style="overflow-x: hidden;">
-          @for (percentage of itemPercentages; track percentage; let index = $index) {
-          <div class="level-item" [formGroup]="itemForms[index]">
-            <div class="level-meta">
-              <strong>{{ percentage }}%</strong>
-              <span>
-                {{ isArabic ? 'درجته' : 'Score' }}
-                {{ itemScoreForPercentage(selectedCriterion(), percentage) }}
-                {{ isArabic ? 'من درجة المعيار' : 'from criterion score' }}
-              </span>
-            </div>
-            <label class="field">
-              <span>{{ isArabic ? 'اسم المقياس' : 'Scale name' }}</span>
-              <input formControlName="title"
-                [placeholder]="isArabic ? 'اكتبي وصف مستوى التقييم' : 'Enter the evaluation level scale'">
-            </label>
-            <label class="field">
-              <span>{{ isArabic ? 'وصف المقياس' : 'Scale description' }}</span>
-              <textarea formControlName="description" rows="2"
-                [placeholder]="isArabic ? 'تفاصيل تساعد المقيم على اختيار هذا المستوى' : 'Details that help the evaluator choose this level'"></textarea>
-            </label>
-          </div>
-          }
-        </div>
-
-        <div style="flex: 0 0 auto; display: grid; gap: 10px; margin-top: auto;">
-          @if (itemMessage) {
-          <p class="form-message" [class.error]="!selectedCriterion()" [class.success]="selectedCriterion()">{{
-            itemMessage }}</p>
-          }
-          <button class="primary-button" type="submit">{{ isArabic ? 'حفظ المقاييس الأربعة' : 'Save Four Scales'
-            }}</button>
-        </div>
-      </form>
-    </article>
-  </div>
-
-  <article class="panel evaluation-tree">
-    <header>
-      <div>
-        <h2>{{ isArabic ? 'هيكل التقييم' : 'Evaluation Structure' }}</h2>
-        <p>{{ isArabic ? 'إجمالي الدرجات القصوى:' : 'Total max scores:' }} <strong>{{ totalMaxScore() }}</strong></p>
-      </div>
-    </header>
-
-    @if (groups().length) {
-    <div class="scrollable-vector">
-      <div class="groups-list">
-        @for (group of groups(); track group.id) {
-        <section class="evaluation-group" [class.active]="group.id === selectedGroupId()">
-          <div class="group-heading">
-            <button type="button" (click)="selectGroup(group.id)">
-              <strong>{{ group.title }}</strong>
-              <span>{{ group.weight }}%</span>
-            </button>
-            <div class="button-row actions">
-              <button class="action-button action-edit" type="button" (click)="editGroup(group)">
-                <span class="action-icon" aria-hidden="true"><app-icon name="edit"></app-icon></span>
-                <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
-              </button>
-              <button class="action-button action-duplicate" type="button" (click)="duplicateGroup(group)">
-                <span class="action-icon" aria-hidden="true">&#128203;</span>
-                <span>{{ isArabic ? 'نسخ' : 'Duplicate' }}</span>
-              </button>
-              <button class="action-button action-delete" type="button" (click)="deleteGroup(group)">
-                <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
-                <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
-              </button>
-            </div>
-          </div>
-          @if (group.description) {
-          <p>{{ group.description }}</p>
-          }
-
-          @if (group.criteria.length) {
-          <div class="criteria-list">
-            @for (criterion of group.criteria; track criterion.id) {
-            <article class="criterion-card" [class.active]="criterion.id === selectedCriterionId()">
-              <div class="criterion-heading">
-                <button type="button" (click)="selectGroup(group.id); selectCriterion(criterion.id)">
-                  <span>{{ criterion.title }}</span>
-                  <small>{{ criterion.weight }}%</small>
-                </button>
-                <div class="button-row actions">
-                  <button class="action-button action-edit" type="button" (click)="editCriterion(group, criterion)">
-                    <span class="action-icon" aria-hidden="true"><app-icon name="edit"></app-icon></span>
-                    <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
-                  </button>
-                  <button class="action-button action-delete" type="button" (click)="deleteCriterion(group, criterion)">
-                    <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
-                    <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
-                  </button>
-                </div>
-              </div>
-
-              @if (criterion.items.length) {
-              <div class="scale-squares">
-                @for (item of sortedItems(criterion); track item.id; let index = $index) {
-                <div class="scale-square" [class]="'scale-square-' + index">
-                  <strong class="square-title" [title]="item.title">{{ item.title }}</strong>
-                  <div class="square-score">{{ itemPercentages[index] || 100 }}%</div>
-                  <div class="square-pts">{{ item.maxScore }} {{ isArabic ? 'درجة' : 'pts' }}</div>
-                  @if (item.description) {
-                  <small class="square-desc" [title]="item.description">{{ item.description }}</small>
-                  } @else {
-                  <small class="square-desc empty-desc">{{ isArabic ? 'بدون وصف' : 'No description' }}</small>
-                  }
-                </div>
-                }
-              </div>
-              } @else {
-              <div class="mini-empty">{{ isArabic ? 'لا توجد مقاييس داخل هذا المعيار.' : 'No scales in this criterion.'
-                }}
-              </div>
-              }
-            </article>
-            }
-          </div>
-          } @else {
-          <div class="mini-empty">{{ isArabic ? 'لا توجد معايير داخل هذه الفئة.' : 'No criteria in this category.' }}
-          </div>
-          }
-        </section>
-        }
-      </div>
-    </div>
-
-    <div class="final-submission-zone">
-      <h3>{{ isArabic ? 'حفظ التقييم النهائي للنظام' : 'Save Final System Evaluation' }}</h3>
-
-      <form class="grid-form" [formGroup]="finalEvaluationForm" (ngSubmit)="submitProjectEvaluation()">
-        <label class="field">
-          <span>{{ isArabic ? 'المشروع' : 'Project' }}</span>
-          <select formControlName="projectId">
-            <option [value]="0">{{ isArabic ? 'اختاري مشروعاً' : 'Select a project' }}</option>
-            @for (project of projects(); track project.id) {
-            <option [value]="project.id">{{ project.title }}</option>
-            }
-          </select>
-        </label>
-
-        <label class="field">
-          <span>{{ isArabic ? 'ملاحظات التقييم الإجمالية' : 'Overall Evaluation Notes' }}</span>
-          <textarea formControlName="notes" rows="2"
-            [placeholder]="isArabic ? 'اكتبي أي ملاحظات عامة حول هذا التقييم...' : 'Enter any general notes...'"></textarea>
-        </label>
-
-        @if (evaluationSubmitMessage) {
-        <p class="form-message" [class.success]="evaluationSubmitMessage.includes('🎉')"
-          [class.error]="evaluationSubmitMessage.includes('❌')">
-          {{ evaluationSubmitMessage }}
-        </p>
-        }
-
-        <button class="primary-button submit-final-button" type="submit">
-          {{ isArabic ? 'إرسال وحفظ التقييم النهائي' : 'Submit Final Evaluation' }}
-        </button>
-      </form>
-    </div>
-
-    } @else {
-    <div class="empty-state">
-      <strong>{{ isArabic ? 'لا توجد تقييمات بعد' : 'No evaluations yet' }}</strong>
-      <span>{{ isArabic ? 'ابدئي بإضافة فئة تقييم من النموذج الأول.' : 'Start by adding an evaluation category from the
-        first form.' }}</span>
-    </div>
-    }
-  </article>
-</section>
+<section class="management-page evaluations-page">
+  <header class="management-header">
+    <div>
+      <h1 class="page-title">{{ isArabic ? 'إدارة التقييمات' : 'Evaluations Management' }}</h1>
+      <p class="page-subtitle">
+        {{ isArabic ? 'أنشئي التقييمات على شكل فئات، وكل فئة تحتوي معايير ومقاييس مع أوزان ودرجات.' : 'Build evaluations
+        as categories. Each category contains criteria and scales with weights and scores.' }}
+      </p>
+    </div>
+    <span class="status-pill">{{ totalGroupWeight() }}% {{ isArabic ? 'وزن الفئات' : 'category weight' }}</span>
+  </header>
+
+  <div class="evaluation-builder">
+    <article class="panel builder-panel">
+      <div class="step-header">
+        <span class="step-badge">{{ isArabic ? 'الخطوة 1' : 'Step 1' }}</span>
+        <h2>{{ editingGroupId ? (isArabic ? 'تعديل فئة' : 'Edit Category') : (isArabic ? 'إضافة فئة تقييم' : 'Add
+          Evaluation Category') }}</h2>
+        <p class="step-desc">{{ isArabic ? 'أنشئي فئة التقييم الرئيسية أولاً (مثال: المناقشة والعرض).' : 'Create the
+          main evaluation category first.' }}</p>
+      </div>
+      <form class="grid-form" [formGroup]="groupForm" (ngSubmit)="saveGroup()">
+        <label class="field">
+          <span>{{ isArabic ? 'اسم الفئة' : 'Category name' }}</span>
+          <input formControlName="title"
+            [placeholder]="isArabic ? 'مثل: العرض والمناقشة' : 'Example: Presentation and discussion'">
+        </label>
+        <label class="field">
+          <span>{{ isArabic ? 'الوصف' : 'Description' }}</span>
+          <textarea formControlName="description"
+            [placeholder]="isArabic ? 'وصف مختصر للفئة' : 'Short category description'"></textarea>
+        </label>
+        <label class="field">
+          <span>{{ isArabic ? 'وزن الفئة (%)' : 'Category weight (%)' }}</span>
+          <input type="number" formControlName="weight" min="1" max="100">
+        </label>
+        @if (groupMessage) {
+        <p class="form-message success">{{ groupMessage }}</p>
+        }
+        <button class="primary-button" type="submit">{{ editingGroupId ? (isArabic ? 'تحديث الفئة' : 'Update Category')
+          : (isArabic ? 'إضافة الفئة' : 'Add Category') }}</button>
+      </form>
+    </article>
+
+    <article class="panel builder-panel" [class.panel-disabled]="!groups().length">
+      <div class="step-header">
+        <span class="step-badge">{{ isArabic ? 'الخطوة 2' : 'Step 2' }}</span>
+        <h2>{{ editingCriterionId ? (isArabic ? 'تعديل معيار' : 'Edit Criterion') : (isArabic ? 'إضافة معيار' : 'Add
+          Criterion') }}</h2>
+        <p class="step-desc">{{ isArabic ? 'اختاري الفئة بالأعلى ثم أضيفي لها المعايير (مثال: جودة الفكرة).' : 'Select
+          the category above and add criteria to it.' }}</p>
+      </div>
+      <form class="grid-form" [formGroup]="criterionForm" (ngSubmit)="saveCriterion()">
+        <label class="field">
+          <span>{{ isArabic ? 'اسم الفئة' : 'Category name' }}</span>
+          <select [value]="selectedGroupId()" (change)="selectGroup($any($event.target).value)">
+            <option [value]="0">{{ isArabic ? 'اختاري فئة' : 'Select category' }}</option>
+            @for (group of groups(); track group.id) {
+            <option [value]="group.id">{{ group.title }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ isArabic ? 'اسم المعيار' : 'Criterion name' }}</span>
+          <input formControlName="title" [placeholder]="isArabic ? 'مثل: جودة الفكرة' : 'Example: Idea quality'">
+        </label>
+        <label class="field">
+          <span>{{ isArabic ? 'وزن المعيار (%)' : 'Criterion weight (%)' }}</span>
+          <input type="number" formControlName="weight" min="1" max="100">
+        </label>
+        @if (criterionMessage) {
+        <p class="form-message" [class.error]="!selectedGroup()" [class.success]="selectedGroup()">{{ criterionMessage
+          }}</p>
+        }
+        <button class="primary-button" type="submit" [disabled]="!selectedGroupId()">{{ editingCriterionId ? (isArabic ?
+          'تحديث المعيار' : 'Update Criterion') : (isArabic ? 'إضافة المعيار' : 'Add Criterion') }}</button>
+      </form>
+    </article>
+
+    <article class="panel builder-panel" [class.panel-disabled]="!selectedCriterionId()">
+      <div class="step-header">
+        <span class="step-badge">{{ isArabic ? 'الخطوة 3' : 'Step 3' }}</span>
+        <h2>{{ isArabic ? 'مقاييس المعيار الأربعة' : 'Four Criterion Scales' }}</h2>
+        <p class="step-desc">{{ isArabic ? 'حددي المعيار، ثم اكتبي تفاصيل المستويات الأربعة للتقييم له.' : 'Select the
+          criterion, then write details for its 4 levels.' }}</p>
+      </div>
+      <form class="grid-form" (ngSubmit)="$event.preventDefault(); saveCriterionItems()">
+        <label class="field" style="flex: 0 0 auto;">
+          <span>{{ isArabic ? 'المعيار المحدد' : 'Selected criterion' }}</span>
+          <select [value]="selectedCriterionId()" (change)="selectCriterion($any($event.target).value)">
+            <option [value]="0">{{ isArabic ? 'اختاري معيارًا' : 'Select criterion' }}</option>
+            @if (selectedGroup(); as group) {
+            @for (criterion of group.criteria; track criterion.id) {
+            <option [value]="criterion.id">{{ criterion.title }}</option>
+            }
+            }
+          </select>
+        </label>
+
+        <div class="scales-scroll-area" style="overflow-x: hidden;">
+          @for (percentage of itemPercentages; track percentage; let index = $index) {
+          <div class="level-item" [formGroup]="itemForms[index]">
+            <div class="level-meta">
+              <strong>{{ percentage }}%</strong>
+              <span>
+                {{ isArabic ? 'درجته' : 'Score' }}
+                {{ itemScoreForPercentage(selectedCriterion(), percentage) }}
+                {{ isArabic ? 'من درجة المعيار' : 'from criterion score' }}
+              </span>
+            </div>
+            <label class="field">
+              <span>{{ isArabic ? 'اسم المقياس' : 'Scale name' }}</span>
+              <input formControlName="title"
+                [placeholder]="isArabic ? 'اكتبي وصف مستوى التقييم' : 'Enter the evaluation level scale'">
+            </label>
+            <label class="field">
+              <span>{{ isArabic ? 'وصف المقياس' : 'Scale description' }}</span>
+              <textarea formControlName="description" rows="2"
+                [placeholder]="isArabic ? 'تفاصيل تساعد المقيم على اختيار هذا المستوى' : 'Details that help the evaluator choose this level'"></textarea>
+            </label>
+          </div>
+          }
+        </div>
+
+        <div style="flex: 0 0 auto; display: grid; gap: 10px; margin-top: auto;">
+          @if (itemMessage) {
+          <p class="form-message" [class.error]="!selectedCriterion()" [class.success]="selectedCriterion()">{{
+            itemMessage }}</p>
+          }
+          <button class="primary-button" type="submit">{{ isArabic ? 'حفظ المقاييس الأربعة' : 'Save Four Scales'
+            }}</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <article class="panel evaluation-tree">
+    <header>
+      <div>
+        <h2>{{ isArabic ? 'هيكل التقييم' : 'Evaluation Structure' }}</h2>
+        <p>{{ isArabic ? 'إجمالي الدرجات القصوى:' : 'Total max scores:' }} <strong>{{ totalMaxScore() }}</strong></p>
+      </div>
+    </header>
+
+    @if (groups().length) {
+    <div class="scrollable-vector">
+      <div class="groups-list">
+        @for (group of groups(); track group.id) {
+        <section class="evaluation-group" [class.active]="group.id === selectedGroupId()">
+          <div class="group-heading">
+            <button type="button" (click)="selectGroup(group.id)">
+              <strong>{{ group.title }}</strong>
+              <span>{{ group.weight }}%</span>
+            </button>
+            <div class="button-row actions">
+              <button class="action-button action-edit" type="button" (click)="editGroup(group)">
+                <span class="action-icon" aria-hidden="true"><app-icon name="edit"></app-icon></span>
+                <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
+              </button>
+              <button class="action-button action-duplicate" type="button" (click)="duplicateGroup(group)">
+                <span class="action-icon" aria-hidden="true">&#128203;</span>
+                <span>{{ isArabic ? 'نسخ' : 'Duplicate' }}</span>
+              </button>
+              <button class="action-button action-delete" type="button" (click)="deleteGroup(group)">
+                <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
+                <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
+              </button>
+            </div>
+          </div>
+          @if (group.description) {
+          <p>{{ group.description }}</p>
+          }
+
+          @if (group.criteria.length) {
+          <div class="criteria-list">
+            @for (criterion of group.criteria; track criterion.id) {
+            <article class="criterion-card" [class.active]="criterion.id === selectedCriterionId()">
+              <div class="criterion-heading">
+                <button type="button" (click)="selectGroup(group.id); selectCriterion(criterion.id)">
+                  <span>{{ criterion.title }}</span>
+                  <small>{{ criterion.weight }}%</small>
+                </button>
+                <div class="button-row actions">
+                  <button class="action-button action-edit" type="button" (click)="editCriterion(group, criterion)">
+                    <span class="action-icon" aria-hidden="true"><app-icon name="edit"></app-icon></span>
+                    <span>{{ isArabic ? 'تعديل' : 'Edit' }}</span>
+                  </button>
+                  <button class="action-button action-delete" type="button" (click)="deleteCriterion(group, criterion)">
+                    <span class="action-icon" aria-hidden="true"><app-icon name="audit"></app-icon></span>
+                    <span>{{ isArabic ? 'حذف' : 'Delete' }}</span>
+                  </button>
+                </div>
+              </div>
+
+              @if (criterion.items.length) {
+              <div class="scale-squares">
+                @for (item of sortedItems(criterion); track item.id; let index = $index) {
+                <div class="scale-square" [class]="'scale-square-' + index">
+                  <strong class="square-title" [title]="item.title">{{ item.title }}</strong>
+                  <div class="square-score">{{ itemPercentages[index] || 100 }}%</div>
+                  <div class="square-pts">{{ item.maxScore }} {{ isArabic ? 'درجة' : 'pts' }}</div>
+                  @if (item.description) {
+                  <small class="square-desc" [title]="item.description">{{ item.description }}</small>
+                  } @else {
+                  <small class="square-desc empty-desc">{{ isArabic ? 'بدون وصف' : 'No description' }}</small>
+                  }
+                </div>
+                }
+              </div>
+              } @else {
+              <div class="mini-empty">{{ isArabic ? 'لا توجد مقاييس داخل هذا المعيار.' : 'No scales in this criterion.'
+                }}
+              </div>
+              }
+            </article>
+            }
+          </div>
+          } @else {
+          <div class="mini-empty">{{ isArabic ? 'لا توجد معايير داخل هذه الفئة.' : 'No criteria in this category.' }}
+          </div>
+          }
+        </section>
+        }
+      </div>
+    </div>
+
+    <div class="final-submission-zone">
+      <h3>{{ isArabic ? 'حفظ التقييم النهائي للنظام' : 'Save Final System Evaluation' }}</h3>
+
+      <form class="grid-form" [formGroup]="finalEvaluationForm" (ngSubmit)="submitProjectEvaluation()">
+        <label class="field">
+          <span>{{ isArabic ? 'المشروع' : 'Project' }}</span>
+          <select formControlName="projectId">
+            <option [value]="0">{{ isArabic ? 'اختاري مشروعاً' : 'Select a project' }}</option>
+            @for (project of projects(); track project.id) {
+            <option [value]="project.id">{{ project.title }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span>{{ isArabic ? 'ملاحظات التقييم الإجمالية' : 'Overall Evaluation Notes' }}</span>
+          <textarea formControlName="notes" rows="2"
+            [placeholder]="isArabic ? 'اكتبي أي ملاحظات عامة حول هذا التقييم...' : 'Enter any general notes...'"></textarea>
+        </label>
+
+        @if (evaluationSubmitMessage) {
+        <p class="form-message" [class.success]="evaluationSubmitMessage.includes('🎉')"
+          [class.error]="evaluationSubmitMessage.includes('❌')">
+          {{ evaluationSubmitMessage }}
+        </p>
+        }
+
+        <button class="primary-button submit-final-button" type="submit">
+          {{ isArabic ? 'إرسال وحفظ التقييم النهائي' : 'Submit Final Evaluation' }}
+        </button>
+      </form>
+    </div>
+
+    } @else {
+    <div class="empty-state">
+      <strong>{{ isArabic ? 'لا توجد تقييمات بعد' : 'No evaluations yet' }}</strong>
+      <span>{{ isArabic ? 'ابدئي بإضافة فئة تقييم من النموذج الأول.' : 'Start by adding an evaluation category from the
+        first form.' }}</span>
+    </div>
+    }
+  </article>
+</section>

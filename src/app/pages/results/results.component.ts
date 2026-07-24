@@ -1,4 +1,3 @@
-import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -37,7 +36,7 @@ interface StudentResultSummary {
 @Component({
   selector: 'app-results',
   standalone: true,
-  imports: [RouterLink, IconComponent],
+  imports: [RouterLink],
   templateUrl: './results.component.html',
   styleUrl: './results.component.scss'
 })
@@ -139,7 +138,3 @@ export class ResultsComponent {
     })?.score ?? 0;
   }
 }
-
-
-
-

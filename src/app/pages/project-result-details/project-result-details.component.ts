@@ -1,4 +1,3 @@
-import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +20,7 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-project-result-details',
   standalone: true,
-  imports: [FormsModule, RouterLink, DatePipe, IconComponent],
+  imports: [FormsModule, RouterLink, DatePipe],
   templateUrl: './project-result-details.component.html',
   styleUrl: './project-result-details.component.scss'
 })
@@ -449,7 +448,3 @@ export class ProjectResultDetailsComponent {
     });
   }
 }
-
-
-
-

@@ -1,4 +1,3 @@
-import { IconComponent } from '../../shared/components/icon/icon.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AuditLogs } from './audit-logs';
@@ -9,7 +8,7 @@ describe('AuditLogs', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AuditLogs, IconComponent]
+      imports: [AuditLogs]
     })
     .compileComponents();
 
@@ -22,7 +21,3 @@ describe('AuditLogs', () => {
     expect(component).toBeTruthy();
   });
 });
-
-
-
-

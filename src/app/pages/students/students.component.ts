@@ -1,5 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { IconComponent } from '../../shared/components/icon/icon.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AdminDataService } from '../../core/admin-data.service';
@@ -15,7 +14,7 @@ interface SpecializationOption {
 @Component({
   selector: 'app-students',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './students.component.html'
 })
 export class StudentsComponent {
@@ -173,7 +172,3 @@ export class StudentsComponent {
     });
   }
 }
-
-
-
-

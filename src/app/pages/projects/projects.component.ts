@@ -1,4 +1,3 @@
-import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -9,7 +8,7 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent {
@@ -144,7 +143,3 @@ export class ProjectsComponent {
     this.messageType = type;
   }
 }
-
-
-
-

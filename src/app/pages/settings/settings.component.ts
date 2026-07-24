@@ -175,6 +175,3 @@ export class SettingsComponent {
     });
   }
 }
-
-
-
