@@ -23,13 +23,19 @@ export const roleGuard: CanActivateFn = (route) => {
     return router.parseUrl('/login');
   }
 
-  if (!roles.includes(user.role)) {
-    return router.parseUrl(permissions.firstAllowedRoute(user.role));
-  }
+  const primaryRole = user.role;
+  const allUserRoles = user.roles && user.roles.length > 0 ? user.roles : [primaryRole];
 
-  if (user.role === 'admin' || permissions.canAccess(user.role, permissionRoute ?? `/${route.routeConfig?.path ?? ''}`)) {
+  const targetPath = permissionRoute ?? `/${route.routeConfig?.path ?? ''}`;
+
+  const hasAccess = allUserRoles.some(r => {
+    if (!roles.includes(r)) return false;
+    return r === 'admin' || permissions.canAccess(r, targetPath);
+  });
+
+  if (hasAccess) {
     return true;
   }
 
-  return router.parseUrl(permissions.firstAllowedRoute(user.role));
+  return router.parseUrl(permissions.firstAllowedRoute(primaryRole));
 };
