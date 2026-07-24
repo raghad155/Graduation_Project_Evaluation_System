@@ -88,7 +88,7 @@ class AdminDataController extends Controller
             'evaluation_groups' => EvaluationGroup::with('criteria.items')->get()
         ];
 
-        return response()->json($data)
+        return response()->json($data, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
                          ->header('Content-Disposition', 'attachment; filename="system_backup_' . date('Ymd_His') . '.json"');
     }
 

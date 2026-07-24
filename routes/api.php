@@ -39,7 +39,7 @@ use App\Http\Controllers\FeedbackController;
 Route::post('/login', [AuthController::class, 'login']);
 
 // إدارة المستخدمين والأدوار (للمدير فقط)
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin|committee_head'])->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
@@ -67,7 +67,7 @@ Route::middleware(['auth:sanctum', 'role:committee_member'])
     });
 
 // مسارات خاصة بالمدير
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin|committee_head'])->group(function () {
     Route::get('/admin/users', function () {
         return "Admin panel";
     });
@@ -94,7 +94,7 @@ Route::apiResource('students', StudentController::class);
 Route::post('students/import', [StudentController::class, 'import']);
 
 // إدارة المشرفين
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin|committee_head'])->group(function () {
     Route::get('/supervisors', [SupervisorController::class, 'index']);
     Route::post('/supervisors', [SupervisorController::class, 'store']);
     Route::get('/supervisors/{id}', [SupervisorController::class, 'show']);
