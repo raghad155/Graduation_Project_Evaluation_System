@@ -1,3 +1,4 @@
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -8,7 +9,7 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-project-members',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, IconComponent],
   templateUrl: './project-members.component.html',
   styleUrl: './project-members.component.scss'
 })
@@ -119,3 +120,4 @@ export class ProjectMembersComponent {
     this.messageType = type;
   }
 }
+

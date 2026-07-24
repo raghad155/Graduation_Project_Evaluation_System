@@ -1,3 +1,4 @@
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -24,7 +25,7 @@ const ROLES = [
 @Component({
     selector: 'app-users',
     standalone: true,
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, IconComponent],
     templateUrl: './users.component.html',
     styleUrl: './users.component.scss'
 })
@@ -204,3 +205,4 @@ export class UsersComponent {
         setTimeout(() => this.message.set(''), 5000);
     }
 }
+

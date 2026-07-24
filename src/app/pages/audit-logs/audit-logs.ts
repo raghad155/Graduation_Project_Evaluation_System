@@ -36,3 +36,4 @@ export class AuditLogs implements OnInit {
     });
   }
 }
+

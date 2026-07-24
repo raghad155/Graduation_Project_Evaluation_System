@@ -138,3 +138,4 @@ export class ResultsComponent {
     })?.score ?? 0;
   }
 }
+

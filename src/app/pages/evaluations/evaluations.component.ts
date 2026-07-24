@@ -1,4 +1,5 @@
-ï»¿import { Component, computed, inject, signal } from '@angular/core';
+import { IconComponent } from '../../shared/components/icon/icon.component';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AdminDataService } from '../../core/admin-data.service';
@@ -8,7 +9,7 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-evaluations',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule, IconComponent],
   templateUrl: './evaluations.component.html',
   styleUrl: './evaluations.component.scss'
 })
@@ -28,7 +29,7 @@ export class EvaluationsComponent {
   });
   readonly totalGroupWeight = computed(() => this.groups().reduce((total, group) => total + group.weight, 0));
 
-  // Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø¯Ø±Ø¬Ø§Øª Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø­Ø³ÙˆØ¨ ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§ ÙˆØ§Ù„Ø°ÙŠ Ø³ÙŠÙØ±Ø³Ù„ Ù„Ù„Ø¨Ø§Ùƒ Ø¥Ù†Ø¯
+  // ãÌãæÚ ÇáÏÑÌÇÊ ÇáÅÌãÇáí ÇáãÍÓæÈ ÊáŞÇÆíğÇ æÇáĞí ÓíõÑÓá ááÈÇß ÅäÏ
   readonly totalMaxScore = computed(() => {
     return this.groups().reduce((total, group) => {
       return total + group.criteria.reduce((criteriaTotal, criterion) => {
@@ -40,7 +41,7 @@ export class EvaluationsComponent {
   groupMessage = '';
   criterionMessage = '';
   itemMessage = '';
-  evaluationSubmitMessage = ''; // Ø±Ø³Ø§Ù„Ø© Ù†Ø¬Ø§Ø­ Ø£Ùˆ ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ
+  evaluationSubmitMessage = ''; // ÑÓÇáÉ äÌÇÍ Ãæ İÔá ÍİÙ ÇáÊŞííã ÇáäåÇÆí
 
   editingGroupId: number | null = null;
   editingCriterionId: number | null = null;
@@ -62,7 +63,7 @@ export class EvaluationsComponent {
     description: ['']
   }));
 
-  // Ù†Ù…ÙˆØ°Ø¬ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø§Ø®ØªÙŠØ§Ø±ÙŠØ© Ù„Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ù…Ø´Ø±ÙˆØ¹
+  // äãæĞÌ ÅÏÎÇá ÇáãáÇÍÙÇÊ ÇáÇÎÊíÇÑíÉ ááÊŞííã ÇáäåÇÆí ááãÔÑæÚ
   readonly finalEvaluationForm = this.fb.nonNullable.group({
     projectId: [0, [Validators.required, Validators.min(1)]],
     notes: ['']
@@ -108,7 +109,7 @@ export class EvaluationsComponent {
 
     if (this.groupForm.invalid) {
       this.groupForm.markAllAsTouched();
-      this.groupMessage = this.isArabic ? 'Ø£ÙƒÙ…Ù„ÙŠ Ø¨ÙŠØ§Ù†Ø§Øª ÙØ¦Ø© Ø§Ù„ØªÙ‚ÙŠÙŠÙ….' : 'Complete the evaluation category fields.';
+      this.groupMessage = this.isArabic ? 'Ãßãáí ÈíÇäÇÊ İÆÉ ÇáÊŞííã.' : 'Complete the evaluation category fields.';
       return;
     }
 
@@ -129,8 +130,8 @@ export class EvaluationsComponent {
     });
 
     this.groupMessage = this.editingGroupId
-      ? (this.isArabic ? 'ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„ÙØ¦Ø©.' : 'Category updated.')
-      : (this.isArabic ? 'ØªÙ…Øª Ø¥Ø¶Ø§ÙØ© Ø§Ù„ÙØ¦Ø©.' : 'Category added.');
+      ? (this.isArabic ? 'Êã ÊÍÏíË ÇáİÆÉ.' : 'Category updated.')
+      : (this.isArabic ? 'ÊãÊ ÅÖÇİÉ ÇáİÆÉ.' : 'Category added.');
   }
 
   editGroup(group: EvaluationGroupRecord): void {
@@ -145,15 +146,15 @@ export class EvaluationsComponent {
   }
 
   deleteGroup(group: EvaluationGroupRecord): void {
-    if (!confirm(this.isArabic ? 'Ù‡Ù„ ØªØ±ÙŠØ¯ÙŠÙ† Ø§Ù„Ø­Ø°ÙØŸ' : 'Are you sure?')) return;
+    if (!confirm(this.isArabic ? 'åá ÊÑíÏíä ÇáÍĞİ¿' : 'Are you sure?')) return;
     this.data.deleteEvaluationGroup(group.id);
-    this.groupMessage = (this.isArabic ? 'ØªÙ… Ø§Ù„Ø­Ø°Ù Ø¨Ù†Ø¬Ø§Ø­' : 'Deleted successfully');
+    this.groupMessage = (this.isArabic ? 'Êã ÇáÍĞİ ÈäÌÇÍ' : 'Deleted successfully');
   }
 
   duplicateGroup(group: EvaluationGroupRecord): void {
-    if (confirm(this.isArabic ? 'Ù‡Ù„ ØªØ±ÙŠØ¯ÙŠÙ† Ø§Ø³ØªÙ†Ø³Ø§Ø® Ù‡Ø°Ø§ Ø§Ù„Ø¨Ù†Ø¯ ÙˆØ¬Ù…ÙŠØ¹ Ø¨Ù†ÙˆØ¯Ù‡ Ø§Ù„ÙØ±Ø¹ÙŠØ©ØŸ' : 'Duplicate this evaluation group and its criteria?')) {
+    if (confirm(this.isArabic ? 'åá ÊÑíÏíä ÇÓÊäÓÇÎ åĞÇ ÇáÈäÏ æÌãíÚ ÈäæÏå ÇáİÑÚíÉ¿' : 'Duplicate this evaluation group and its criteria?')) {
       this.data.duplicateEvaluationGroup(group.id);
-      this.groupMessage = (this.isArabic ? 'ØªÙ… Ø§Ù„Ù†Ø³Ø® Ø¨Ù†Ø¬Ø§Ø­' : 'Duplicated successfully');
+      this.groupMessage = (this.isArabic ? 'Êã ÇáäÓÎ ÈäÌÇÍ' : 'Duplicated successfully');
     }
   }
 
@@ -162,13 +163,13 @@ export class EvaluationsComponent {
     const group = this.selectedGroup();
 
     if (!group) {
-      this.criterionMessage = this.isArabic ? 'Ø§Ø®ØªØ§Ø±ÙŠ ÙØ¦Ø© ØªÙ‚ÙŠÙŠÙ… Ø£ÙˆÙ„Ù‹Ø§.' : 'Select an evaluation category first.';
+      this.criterionMessage = this.isArabic ? 'ÇÎÊÇÑí İÆÉ ÊŞííã ÃæáğÇ.' : 'Select an evaluation category first.';
       return;
     }
 
     if (this.criterionForm.invalid) {
       this.criterionForm.markAllAsTouched();
-      this.criterionMessage = this.isArabic ? 'Ø£ÙƒÙ…Ù„ÙŠ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¹ÙŠØ§Ø±.' : 'Complete the criterion fields.';
+      this.criterionMessage = this.isArabic ? 'Ãßãáí ÈíÇäÇÊ ÇáãÚíÇÑ.' : 'Complete the criterion fields.';
       return;
     }
 
@@ -187,8 +188,8 @@ export class EvaluationsComponent {
     });
 
     this.criterionMessage = this.editingCriterionId
-      ? (this.isArabic ? 'ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø¹ÙŠØ§Ø±.' : 'Criterion updated.')
-      : (this.isArabic ? 'ØªÙ…Øª Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø¹ÙŠØ§Ø±.' : 'Criterion added.');
+      ? (this.isArabic ? 'Êã ÊÍÏíË ÇáãÚíÇÑ.' : 'Criterion updated.')
+      : (this.isArabic ? 'ÊãÊ ÅÖÇİÉ ÇáãÚíÇÑ.' : 'Criterion added.');
 
   }
 
@@ -204,7 +205,7 @@ export class EvaluationsComponent {
 
   deleteCriterion(group: EvaluationGroupRecord, criterion: EvaluationCriterionRecord): void {
     const confirmed = confirm(this.isArabic
-      ? `Ù‡Ù„ ØªØ±ÙŠØ¯ÙŠÙ† Ø­Ø°Ù Ù…Ø¹ÙŠØ§Ø± "${criterion.title}"ØŸ`
+      ? `åá ÊÑíÏíä ÍĞİ ãÚíÇÑ "${criterion.title}"¿`
       : `Delete criterion "${criterion.title}"?`);
 
     if (!confirmed) {
@@ -223,7 +224,7 @@ export class EvaluationsComponent {
     const criterion = this.selectedCriterion();
 
     if (!group || !criterion) {
-      this.itemMessage = this.isArabic ? 'Ø§Ø®ØªØ§Ø±ÙŠ ÙØ¦Ø© ÙˆÙ…Ø¹ÙŠØ§Ø±Ù‹Ø§ Ù‚Ø¨Ù„ Ø­ÙØ¸ Ø§Ù„Ù…Ù‚Ø§ÙŠÙŠØ³ Ø§Ù„Ø£Ø±Ø¨Ø¹Ø©.' : 'Select a category and criterion before saving the four scales.';
+      this.itemMessage = this.isArabic ? 'ÇÎÊÇÑí İÆÉ æãÚíÇÑğÇ ŞÈá ÍİÙ ÇáãŞÇííÓ ÇáÃÑÈÚÉ.' : 'Select a category and criterion before saving the four scales.';
       return;
     }
 
@@ -231,7 +232,7 @@ export class EvaluationsComponent {
 
     if (invalid) {
       this.itemForms.forEach((form) => form.markAllAsTouched());
-      this.itemMessage = this.isArabic ? 'Ø£Ø¯Ø®Ù„ÙŠ Ø£Ø³Ù…Ø§Ø¡ Ø§Ù„Ù…Ù‚Ø§ÙŠÙŠØ³ Ø§Ù„Ø£Ø±Ø¨Ø¹Ø© Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…Ø¹ÙŠØ§Ø±.' : 'Enter the four scale names for this criterion.';
+      this.itemMessage = this.isArabic ? 'ÃÏÎáí ÃÓãÇÁ ÇáãŞÇííÓ ÇáÃÑÈÚÉ áåĞÇ ÇáãÚíÇÑ.' : 'Enter the four scale names for this criterion.';
       return;
     }
 
@@ -252,11 +253,11 @@ export class EvaluationsComponent {
 
     this.data.replaceEvaluationItems(group.id, criterion.id, items).subscribe({
       next: () => {
-        this.itemMessage = this.isArabic ? 'âœ… ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù…Ù‚Ø§ÙŠÙŠØ³ Ø§Ù„Ø£Ø±Ø¨Ø¹Ø© Ù„Ù„Ù…Ø¹ÙŠØ§Ø± Ø¨Ù†Ø¬Ø§Ø­.' : 'âœ… The four criterion scales were saved successfully.';
+        this.itemMessage = this.isArabic ? '? Êã ÍİÙ ÇáãŞÇííÓ ÇáÃÑÈÚÉ ááãÚíÇÑ ÈäÌÇÍ.' : '? The four criterion scales were saved successfully.';
       },
       error: (error) => {
         console.error('Error saving scales:', error);
-        this.itemMessage = this.isArabic ? 'âŒ ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ù…Ù‚Ø§ÙŠÙŠØ³ØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„ Ø§Ù„Ø³ÙŠØ±ÙØ±.' : 'âŒ Failed to save scales. Check server status.';
+        this.itemMessage = this.isArabic ? '? İÔá ÍİÙ ÇáãŞÇííÓ¡ íÑÌì ÇáÊÍŞŞ ãä ÇÊÕÇá ÇáÓíÑİÑ.' : '? Failed to save scales. Check server status.';
       }
     });
   }
@@ -275,20 +276,20 @@ export class EvaluationsComponent {
   }
 
   /**
-   * ğŸš€ Ø§Ù„Ø¯Ø§Ù„Ø© Ø§Ù„Ù…Ø­Ø¯Ø«Ø© Ù…Ø¹ Ø¬ÙÙ…Ù„ Ø·Ø¨Ø§Ø¹Ø© Ù„Ù„ØªØ£ÙƒØ¯ Ù…Ù† Ø¹Ù…Ù„ Ø§Ù„Ø²Ø± ÙÙŠ Ø§Ù„Ù€ Log
+   * ?? ÇáÏÇáÉ ÇáãÍÏËÉ ãÚ Ìõãá ØÈÇÚÉ ááÊÃßÏ ãä Úãá ÇáÒÑ İí ÇáÜ Log
    */
   submitProjectEvaluation(): void {
-    console.log('ğŸ”˜ ØªÙ… Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ Ø²Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ!');
+    console.log('?? Êã ÇáÖÛØ Úáì ÒÑ ÇáÊŞííã ÇáäåÇÆí!');
     const projectId = this.finalEvaluationForm.value.projectId;
-    console.log('Ø§Ù„Ù…Ø¹Ø±Ù‘Ù Ø§Ù„Ù…Ø³ØªÙ„Ù… (projectId):', projectId);
+    console.log('ÇáãÚÑøİ ÇáãÓÊáã (projectId):', projectId);
 
     this.evaluationSubmitMessage = '';
 
-    // ØªÙØªÙŠØ´ Ø£Ù…Ù†ÙŠ: Ø¥Ø°Ø§ Ù„Ù… ÙŠØªÙ… ØªØ­Ø¯ÙŠØ¯ Ù…Ø´Ø±ÙˆØ¹ Ø£Ùˆ Ø§Ù„Ù…Ø¹Ø±Ù‘Ù 0ØŒ Ù†Ø¨Ù‡ Ø§Ù„Ù…ØªØµÙØ­ ÙÙˆØ±Ø§Ù‹
+    // ÊİÊíÔ Ããäí: ÅĞÇ áã íÊã ÊÍÏíÏ ãÔÑæÚ Ãæ ÇáãÚÑøİ 0¡ äÈå ÇáãÊÕİÍ İæÑÇğ
     if (!projectId || projectId === 0) {
-      console.warn('âš ï¸ ØªÙ†Ø¨ÙŠÙ‡: Ù„Ù… ÙŠØªÙ… ØªÙ…Ø±ÙŠØ± Ù…Ø¹Ø±Ù‘Ù Ù…Ø´Ø±ÙˆØ¹ ØµØ§Ù„Ø­ (Ø§Ù„Ù…Ø¹Ø±Ù‘Ù Ø§Ù„Ø­Ø§Ù„ÙŠ 0 Ø£Ùˆ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯).');
+      console.warn('?? ÊäÈíå: áã íÊã ÊãÑíÑ ãÚÑøİ ãÔÑæÚ ÕÇáÍ (ÇáãÚÑøİ ÇáÍÇáí 0 Ãæ ÛíÑ ãæÌæÏ).');
       this.evaluationSubmitMessage = this.isArabic
-        ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø§Ø®ØªÙŠØ§Ø± Ù…Ø´Ø±ÙˆØ¹ Ø£ÙˆÙ„Ø§Ù‹ Ù„Ù„ØªÙ‚ÙŠÙŠÙ….'
+        ? 'ÇáÑÌÇÁ ÇÎÊíÇÑ ãÔÑæÚ ÃæáÇğ ááÊŞííã.'
         : 'Please select a project first to evaluate.';
       return;
     }
@@ -296,24 +297,24 @@ export class EvaluationsComponent {
     const payload = {
       projectId: projectId,
       score: this.totalMaxScore(),
-      notes: this.finalEvaluationForm.value.notes?.trim() || (this.isArabic ? 'ØªÙ‚ÙŠÙŠÙ… ØªÙ„Ù‚Ø§Ø¦ÙŠ Ù…Ù† Ø§Ù„Ù†Ø¸Ø§Ù…' : 'Automated evaluation note')
+      notes: this.finalEvaluationForm.value.notes?.trim() || (this.isArabic ? 'ÊŞííã ÊáŞÇÆí ãä ÇáäÙÇã' : 'Automated evaluation note')
     };
 
-    console.log('ğŸ“¦ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±Ø³Ù„Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø³ÙŠØ±ÙØ±:', payload);
+    console.log('?? ÇáÈíÇäÇÊ ÇáãÑÓáÉ Åáì ÇáÓíÑİÑ:', payload);
 
     this.data.submitEvaluationToBackend(payload).subscribe({
       next: (response) => {
-        console.log('âœ… Ù†Ø¬Ø­ Ø§Ù„Ø­ÙØ¸! Ø±Ø¯ Ø§Ù„Ø³ÙŠØ±ÙØ±:', response);
+        console.log('? äÌÍ ÇáÍİÙ! ÑÏ ÇáÓíÑİÑ:', response);
         this.evaluationSubmitMessage = this.isArabic
-          ? 'ğŸ‰ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ ÙˆØ­ÙØ¸ Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø¨Ù†Ø¬Ø§Ø­ ÙÙŠ Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª!'
-          : 'ğŸ‰ Evaluation successfully saved to the database!';
+          ? '?? Êã ÅÑÓÇá æÍİÙ ÇáÊŞííã ÈäÌÇÍ İí ŞÇÚÏÉ ÇáÈíÇäÇÊ!'
+          : '?? Evaluation successfully saved to the database!';
         this.finalEvaluationForm.reset();
       },
       error: (error) => {
-        console.error('âŒ Ø®Ø·Ø£ Ù…Ù† Ø§Ù„Ø³ÙŠØ±ÙØ± Ø£Ø«Ù†Ø§Ø¡ Ø­ÙØ¸ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…:', error);
+        console.error('? ÎØÃ ãä ÇáÓíÑİÑ ÃËäÇÁ ÍİÙ ÇáÊŞííã:', error);
         this.evaluationSubmitMessage = this.isArabic
-          ? 'âŒ ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…ØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„ Ø§Ù„Ø³ÙŠØ±ÙØ±.'
-          : 'âŒ Failed to save evaluation. Check server status.';
+          ? '? İÔá ÍİÙ ÇáÊŞííã¡ íÑÌì ÇáÊÍŞŞ ãä ÇÊÕÇá ÇáÓíÑİÑ.'
+          : '? Failed to save evaluation. Check server status.';
       }
     });
   }

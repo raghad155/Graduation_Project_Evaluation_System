@@ -123,3 +123,4 @@ export class LoginComponent {
     return 'تعذر تسجيل الدخول. يرجى المحاولة مرة أخرى.';
   }
 }
+

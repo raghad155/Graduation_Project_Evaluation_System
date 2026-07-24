@@ -1,10 +1,10 @@
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { AppLanguage, AppTheme, PreferencesService } from '../../core/preferences.service';
 import { AdminDataService } from '../../core/admin-data.service';
-import { IconComponent } from '../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-settings',
@@ -175,3 +175,5 @@ export class SettingsComponent {
     });
   }
 }
+
+

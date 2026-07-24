@@ -17,3 +17,4 @@ export class HomeRedirectComponent implements OnInit {
     this.router.navigateByUrl(this.permissions.firstAllowedRoute(this.auth.currentUser?.role));
   }
 }
+

@@ -14,3 +14,4 @@ export class SupervisorComponent {
     return this.preferences.state.language === 'ar';
   }
 }
+

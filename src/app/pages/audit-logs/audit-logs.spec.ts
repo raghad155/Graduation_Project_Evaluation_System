@@ -21,3 +21,4 @@ describe('AuditLogs', () => {
     expect(component).toBeTruthy();
   });
 });
+

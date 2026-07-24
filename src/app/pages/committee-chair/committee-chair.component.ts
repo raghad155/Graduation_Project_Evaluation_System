@@ -14,3 +14,4 @@ export class CommitteeChairComponent {
     return this.preferences.state.language === 'ar';
   }
 }
+

@@ -1,3 +1,5 @@
+import { IconComponent } from '../../shared/components/icon/icon.component';
+import { NgClass, JsonPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AdminDataService } from '../../core/admin-data.service';
@@ -7,7 +9,8 @@ import { PreferencesService } from '../../core/preferences.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  templateUrl: './dashboard.component.html',
+  imports: [NgClass, JsonPipe, IconComponent],
+    templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
@@ -96,3 +99,5 @@ export class DashboardComponent {
     ];
   });
 }
+
+
