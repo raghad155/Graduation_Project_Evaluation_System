@@ -1,82 +1,164 @@
-<section class="management-page results-page">
-  <header class="management-header">
-    <div>
-      <h1 class="page-title">{{ isArabic ? 'نماذج تقييم المشاريع' : 'Project Evaluation Forms' }}</h1>
-      <p class="page-subtitle">
-        {{ isArabic ? 'افتحي كل مشروع وأدخلي درجاته من البنود والمعايير التي أنشأها الأدمن.' : 'Open each project and enter scores using the groups, criteria, and items created by the admin.' }}
-      </p>
-    </div>
-    <span class="status-pill">{{ summaries().length }} {{ isArabic ? 'مشاريع' : 'projects' }}</span>
-  </header>
-
-  <article class="panel results-panel">
-    @if (groups().length && projects().length) {
-      <div class="results-grid">
-        @for (summary of summaries(); track summary.project.id) {
-          <a class="result-card" [routerLink]="['/project-evaluation-forms', summary.project.id]">
-            <div class="result-card-header">
-              <div>
-                <span>{{ isArabic ? 'المشروع' : 'Project' }}</span>
-                <h2>{{ summary.project.title }}</h2>
-              </div>
-              <strong>{{ summary.percent }}%</strong>
-            </div>
-
-            <p>{{ summary.project.description }}</p>
-
-            <div class="score-bar" aria-hidden="true">
-              <span [style.width.%]="summary.percent"></span>
-            </div>
-
-            <dl class="result-meta">
-              <div>
-                <dt>{{ isArabic ? 'متوسط الدرجة' : 'Average score' }}</dt>
-                <dd>{{ summary.earned }} / {{ summary.total }}</dd>
-              </div>
-              <div>
-                <dt>{{ isArabic ? 'المعايير المدخلة' : 'Entered criteria' }}</dt>
-                <dd>{{ summary.completedItems }} / {{ summary.totalItems }}</dd>
-              </div>
-              <div>
-                <dt>{{ isArabic ? 'المشرف' : 'Supervisor' }}</dt>
-                <dd>{{ summary.supervisor || (isArabic ? 'غير محدد' : 'Not assigned') }}</dd>
-              </div>
-            </dl>
-
-            @if (summary.studentResults.length) {
-              <div class="student-results">
-                <strong>{{ isArabic ? 'درجات الطلاب' : 'Student scores' }}</strong>
-                @for (studentResult of summary.studentResults; track studentResult.student.id) {
-                  <div class="student-result-row">
-                    <div>
-                      <span>{{ studentResult.student.fullName }}</span>
-                      <small>{{ studentResult.student.academicNumber }}</small>
-                    </div>
-                    <strong>{{ studentResult.earned }} / {{ studentResult.total }}</strong>
-                    <em>{{ studentResult.percent }}%</em>
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="student-results empty">
-                <span>{{ isArabic ? 'لا يوجد طلاب مرتبطون بهذا المشروع.' : 'No students are linked to this project.' }}</span>
-              </div>
-            }
-
-            <span class="open-form-button">{{ isArabic ? 'فتح نموذج التقييم' : 'Open evaluation form' }}</span>
-          </a>
-        }
-      </div>
-    } @else if (!groups().length) {
-      <div class="empty-state">
-        <strong>{{ isArabic ? 'لا توجد بنود تقييم' : 'No evaluation items' }}</strong>
-        <span>{{ isArabic ? 'يجب على الأدمن إضافة مجموعات التقييم والمعايير والبنود أولًا من صفحة إعداد التقييمات.' : 'The admin must add evaluation groups, criteria, and items first from Evaluation Setup.' }}</span>
-      </div>
-    } @else {
-      <div class="empty-state">
-        <strong>{{ isArabic ? 'لا توجد مشاريع' : 'No projects' }}</strong>
-        <span>{{ isArabic ? 'أضيفي مشروعًا ليظهر هنا كنموذج تقييم.' : 'Add a project to show it here as an evaluation form.' }}</span>
-      </div>
-    }
-  </article>
-</section>
+<section class="management-page results-page">
+
+  <header class="management-header">
+
+    <div>
+
+      <h1 class="page-title">{{ isArabic ? 'نماذج تقييم المشاريع' : 'Project Evaluation Forms' }}</h1>
+
+      <p class="page-subtitle">
+
+        {{ isArabic ? 'افتحي كل مشروع وأدخلي درجاته من البنود والمعايير التي أنشأها الأدمن.' : 'Open each project and enter scores using the groups, criteria, and items created by the admin.' }}
+
+      </p>
+
+    </div>
+
+    <span class="status-pill">{{ summaries().length }} {{ isArabic ? 'مشاريع' : 'projects' }}</span>
+
+  </header>
+
+
+
+  <article class="panel results-panel">
+
+    @if (groups().length && projects().length) {
+
+      <div class="results-grid">
+
+        @for (summary of summaries(); track summary.project.id) {
+
+          <a class="result-card" [routerLink]="['/project-evaluation-forms', summary.project.id]">
+
+            <div class="result-card-header">
+
+              <div>
+
+                <span>{{ isArabic ? 'المشروع' : 'Project' }}</span>
+
+                <h2>{{ summary.project.title }}</h2>
+
+              </div>
+
+              <strong>{{ summary.percent }}%</strong>
+
+            </div>
+
+
+
+            <p>{{ summary.project.description }}</p>
+
+
+
+            <div class="score-bar" aria-hidden="true">
+
+              <span [style.width.%]="summary.percent"></span>
+
+            </div>
+
+
+
+            <dl class="result-meta">
+
+              <div>
+
+                <dt>{{ isArabic ? 'متوسط الدرجة' : 'Average score' }}</dt>
+
+                <dd>{{ summary.earned }} / {{ summary.total }}</dd>
+
+              </div>
+
+              <div>
+
+                <dt>{{ isArabic ? 'المعايير المدخلة' : 'Entered criteria' }}</dt>
+
+                <dd>{{ summary.completedItems }} / {{ summary.totalItems }}</dd>
+
+              </div>
+
+              <div>
+
+                <dt>{{ isArabic ? 'المشرف' : 'Supervisor' }}</dt>
+
+                <dd>{{ summary.supervisor || (isArabic ? 'غير محدد' : 'Not assigned') }}</dd>
+
+              </div>
+
+            </dl>
+
+
+
+            @if (summary.studentResults.length) {
+
+              <div class="student-results">
+
+                <strong>{{ isArabic ? 'درجات الطلاب' : 'Student scores' }}</strong>
+
+                @for (studentResult of summary.studentResults; track studentResult.student.id) {
+
+                  <div class="student-result-row">
+
+                    <div>
+
+                      <span>{{ studentResult.student.fullName }}</span>
+
+                      <small>{{ studentResult.student.academicNumber }}</small>
+
+                    </div>
+
+                    <strong>{{ studentResult.earned }} / {{ studentResult.total }}</strong>
+
+                    <em>{{ studentResult.percent }}%</em>
+
+                  </div>
+
+                }
+
+              </div>
+
+            } @else {
+
+              <div class="student-results empty">
+
+                <span>{{ isArabic ? 'لا يوجد طلاب مرتبطون بهذا المشروع.' : 'No students are linked to this project.' }}</span>
+
+              </div>
+
+            }
+
+
+
+            <span class="open-form-button">{{ isArabic ? 'فتح نموذج التقييم' : 'Open evaluation form' }}</span>
+
+          </a>
+
+        }
+
+      </div>
+
+    } @else if (!groups().length) {
+
+      <div class="empty-state">
+
+        <strong>{{ isArabic ? 'لا توجد بنود تقييم' : 'No evaluation items' }}</strong>
+
+        <span>{{ isArabic ? 'يجب على الأدمن إضافة مجموعات التقييم والمعايير والبنود أولًا من صفحة إعداد التقييمات.' : 'The admin must add evaluation groups, criteria, and items first from Evaluation Setup.' }}</span>
+
+      </div>
+
+    } @else {
+
+      <div class="empty-state">
+
+        <strong>{{ isArabic ? 'لا توجد مشاريع' : 'No projects' }}</strong>
+
+        <span>{{ isArabic ? 'أضف مشروعًا ليظهر هنا كنموذج تقييم.' : 'Add a project to show it here as an evaluation form.' }}</span>
+
+      </div>
+
+    }
+
+  </article>
+
+</section>
+

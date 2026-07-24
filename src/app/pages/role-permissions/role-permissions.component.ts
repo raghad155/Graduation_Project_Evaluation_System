@@ -28,7 +28,7 @@ export class RolePermissionsComponent {
 
   get pageSubtitle(): string {
     return this.isArabic
-      ? 'حددي الصفحات التي تظهر لكل دور داخل النظام.'
+      ? 'حدد الصفحات التي تظهر لكل دور داخل النظام.'
       : 'Choose which pages are visible and accessible for each role.';
   }
 

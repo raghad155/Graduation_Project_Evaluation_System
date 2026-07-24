@@ -35,7 +35,7 @@
         <label class="field">
           <span>{{ isArabic ? 'التخصص' : 'Specialization' }}</span>
           <select formControlName="specialization">
-            <option value="">{{ isArabic ? 'اختاري التخصص' : 'Select specialization' }}</option>
+            <option value="">{{ isArabic ? 'اختر التخصص' : 'Select specialization' }}</option>
             @for (specialization of specializations(); track specialization.value) {
             <option [value]="specialization.value">
               {{ isArabic ? specialization.labelAr : specialization.labelEn }}
@@ -136,7 +136,7 @@
       } @else {
       <div class="empty-state">
         <strong>{{ isArabic ? 'لا يوجد طلاب' : 'No students found' }}</strong>
-        <span>{{ isArabic ? 'أضيفي طالبًا من النموذج أو غيّري البحث.' : 'Add a student from the form or change the
+        <span>{{ isArabic ? 'أضف طالبًا من النموذج أو غيّري البحث.' : 'Add a student from the form or change the
           search filters.' }}</span>
       </div>
       }

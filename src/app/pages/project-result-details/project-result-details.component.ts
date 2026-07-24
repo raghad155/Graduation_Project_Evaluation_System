@@ -217,7 +217,7 @@ export class ProjectResultDetailsComponent {
     const studentId = this.activeStudentId();
 
     if (!studentId) {
-      this.savedMessage = this.isArabic ? 'اختاري طالبًا من ترويسة الطلاب قبل التقييم.' : 'Select a student from the student header before scoring.';
+      this.savedMessage = this.isArabic ? 'اختر طالبًا من ترويسة الطلاب قبل التقييم.' : 'Select a student from the student header before scoring.';
       return;
     }
 

@@ -1,398 +1,796 @@
-<section class="management-page result-details-page">
-  <header class="management-header">
-    <div>
-      <a class="back-link" routerLink="/project-evaluation-forms">{{ isArabic ? 'العودة إلى نماذج التقييم' : 'Back to
-        evaluation forms' }}</a>
-      <h1 class="page-title">{{ isArabic ? 'نموذج تقييم المشروع' : 'Project Evaluation Form' }}</h1>
-      <p class="page-subtitle">
-        {{ isArabic ? 'اختاري المشروع ثم الطالب، وبعدها حددي مستوى التقييم المناسب لكل معيار من البنود التي أنشأها
-        الأدمن.' : 'Choose the project and student, then select the suitable rubric level for each admin-defined
-        criterion.' }}
-      </p>
-    </div>
-    <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
-      <span class="status-pill">{{ resultPercent() }}%</span>
-
-      @if (project()?.is_locked) {
-      <span class="status-pill" style="background: var(--surface-200, #eee); color: var(--text-muted, #666);">
-        🔒 {{ isArabic ? 'مكتمل (معتمد)' : 'Completed (Locked)' }}
-      </span>
-      }
-
-      @if (!project()?.is_locked || isCommitteeHead()) {
-      <button type="button" class="primary-button" (click)="toggleLock()">
-        @if (project()?.is_locked) {
-        🔓 {{ isArabic ? 'فك اعتماد التقييم' : 'Unlock Evaluation' }}
-        } @else {
-        🔒 {{ isArabic ? 'اعتماد وإغلاق التقييم' : 'Finalize & Lock Evaluation' }}
-        }
-      </button>
-      }
-
-      @if (project()?.is_locked) {
-      <button type="button" class="secondary-button" (click)="loadFinalReport()">
-        📄 {{ isArabic ? 'عرض النتيجة النهائية' : 'View Final Report' }}
-      </button>
-      }
-    </div>
-  </header>
-
-  @if (project()) {
-  @if (hasDiscrepancy() && !project()?.is_locked) {
-  <div class="alert-warning panel"
-    style="background: rgba(255, 193, 7, 0.15); border: 1px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; align-items: flex-start; gap: 15px;">
-    <div style="font-size: 2rem; color: #d39e00;">⚠️</div>
-    <div>
-      <h3 style="margin: 0 0 5px; color: #856404;">{{ isArabic ? 'تنبيه: تباين كبير في تقييمات اللجنة!' : 'Alert: Large
-        Discrepancy in Committee Evaluations!' }}</h3>
-      <p style="margin: 0; color: #856404;">{{ isArabic ? 'الفرق بين درجات بعض أعضاء اللجنة لنفس الطالب في هذا المشروع
-        ضخم جداً. يوصى بمراجعة وتوحيد التقييمات عبر الملاحظات العامة قبل اعتماد التقييم وإغلاقه نهائياً.' : 'The
-        difference between the scores given by some committee members for the same student in this project is massive.
-        It is recommended to review and unify evaluations via General Feedbacks before finalizing.' }}</p>
-    </div>
-  </div>
-  }
-
-  <article class="panel evaluation-toolbar">
-    <label class="project-selector">
-      <span>{{ isArabic ? 'المشروع المحدد' : 'Selected project' }}</span>
-      <select [value]="projectId()" (change)="goToProject($any($event.target).value)">
-        @for (item of projects(); track item.id) {
-        <option [value]="item.id">{{ item.title }}</option>
-        }
-      </select>
-    </label>
-
-    <div class="toolbar-stats">
-      <div>
-        <span>{{ isArabic ? 'الطالب الحالي' : 'Current student' }}</span>
-        <strong>{{ activeStudent()?.fullName || (isArabic ? 'غير محدد' : 'Not selected') }}</strong>
-      </div>
-      <div>
-        <span>{{ isArabic ? 'درجة الطالب' : 'Student score' }}</span>
-        <strong>{{ earnedScore() }} / {{ totalMaxScore() }}</strong>
-      </div>
-      <div>
-        <span>{{ isArabic ? 'المعايير المكتملة' : 'Completed criteria' }}</span>
-        <strong>{{ completedItems() }} / {{ allCriteria().length }}</strong>
-      </div>
-    </div>
-  </article>
-
-  @if (projectStudents().length) {
-  <article class="panel student-strip">
-    <div>
-      <span>{{ isArabic ? 'طلاب المشروع' : 'Project students' }}</span>
-      <strong>{{ projectStudents().length }} {{ isArabic ? 'طلاب' : 'students' }}</strong>
-    </div>
-    <div class="student-tabs">
-      @for (student of projectStudents(); track student.id) {
-      <button type="button" [class.active]="student.id === activeStudentId()" (click)="selectStudent(student.id)">
-        <strong>{{ student.fullName }}</strong>
-        <small>{{ student.academicNumber }}</small>
-      </button>
-      }
-    </div>
-  </article>
-  } @else {
-  <div class="empty-state">
-    <strong>{{ isArabic ? 'لا يوجد طلاب مرتبطون بهذا المشروع' : 'No students are linked to this project' }}</strong>
-    <span>{{ isArabic ? 'اربطي الطلاب بالمشروع من صفحة أعضاء المشاريع قبل إدخال التقييم.' : 'Link students to the
-      project from Project Members before scoring.' }}</span>
-  </div>
-  }
-
-  <article class="panel result-summary-panel">
-    <div>
-      <span>{{ isArabic ? 'نتيجة الطالب المحدد' : 'Selected student result' }}</span>
-      <strong>{{ resultPercent() }}%</strong>
-    </div>
-    <div class="score-bar" aria-hidden="true">
-      <span [style.width.%]="resultPercent()"></span>
-    </div>
-  </article>
-
-  @if (projectStudents().length && groups().length && allCriteria().length) {
-  <form class="evaluation-form" (ngSubmit)="saveEvaluation()">
-    <article class="panel evaluation-sheet" [attr.dir]="isArabic ? 'rtl' : 'ltr'">
-      <div class="evaluation-sheet-scroll">
-        <table class="evaluation-sheet-table">
-          <thead>
-            <tr>
-              <th class="sheet-label-cell">{{ isArabic ? 'البند' : 'Item' }}</th>
-              @for (student of projectStudents(); track student.id) {
-              <th class="student-heading">
-                <button type="button" [class.active]="student.id === activeStudentId()"
-                  (click)="selectStudent(student.id)">
-                  {{ student.fullName }}
-                </button>
-              </th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="sheet-total-row">
-              <th>{{ isArabic ? 'الدرجة النهائية' : 'Final score' }}</th>
-              @for (student of projectStudents(); track student.id) {
-              <td>{{ studentTotalScore(student.id) }} / {{ totalMaxScore() }}</td>
-              }
-            </tr>
-
-            @for (group of groups(); track group.id) {
-            <tr class="sheet-group-row">
-              <th>
-                <span>{{ group.title }}</span>
-              </th>
-              @for (student of projectStudents(); track student.id) {
-              <td>{{ studentGroupScore(group, student.id) }} / {{ groupMaxScore(group) }}</td>
-              }
-            </tr>
-
-            @for (criterion of group.criteria; track criterion.id) {
-            <tr class="sheet-criterion-row">
-              <th>
-                <span>{{ criterion.title }}</span>
-                <label class="sheet-full-check" [class.full]="isCriterionPerfectForAll(criterion)">
-                  <input type="checkbox" [checked]="isCriterionPerfectForAll(criterion)" [disabled]="!canEdit()"
-                    (change)="markCriterionFullForAll(criterion, $any($event.target).checked)">
-                  <small>{{ isArabic ? 'تعبئة كاملة 100%' : 'Fill 100%' }}</small>
-                </label>
-              </th>
-              @for (student of projectStudents(); track student.id) {
-              <td>{{ studentCriterionScore(criterion, student.id) }} / {{ criterionMaxScore(criterion) }}</td>
-              }
-            </tr>
-
-            @for (item of sortedItems(criterion); track item.id) {
-            <tr class="sheet-rubric-row">
-              <th>
-                <span>{{ item.title }}</span>
-                <small>{{ isArabic ? 'مقياس المعيار' : 'Criterion scale' }}</small>
-              </th>
-              @for (student of projectStudents(); track student.id) {
-              <td>
-                <button class="rubric-cell-button" type="button" [disabled]="!canEdit()"
-                  [class.selected]="isLevelSelectedForStudent(criterion, item.id, student.id)"
-                  (click)="selectCriterionLevelForStudent(criterion, item, student.id)">
-                  <span>{{ item.title }}</span>
-                  <small>{{ rubricScoreLabel(item, criterion) }}</small>
-                </button>
-              </td>
-              }
-            </tr>
-            }
-            }
-            }
-          </tbody>
-        </table>
-      </div>
-    </article>
-
-    @for (group of groups(); track group.id) {
-    <article class="panel result-group">
-      <header>
-        <div>
-          <span>{{ isArabic ? 'مجموعة تقييم' : 'Evaluation group' }}</span>
-          <h2>{{ group.title }}</h2>
-          @if (group.description) {
-          <p>{{ group.description }}</p>
-          }
-        </div>
-        <div class="group-score">
-          <strong>{{ groupEarnedScore(group) }} / {{ groupMaxScore(group) }}</strong>
-          <small>{{ group.weight }}% {{ isArabic ? 'وزن' : 'weight' }}</small>
-        </div>
-      </header>
-
-      <div class="score-bar group-bar" aria-hidden="true">
-        <span [style.width.%]="groupPercent(group)"></span>
-      </div>
-
-      @for (criterion of group.criteria; track criterion.id) {
-      <section class="criterion-section">
-        <div class="criterion-title">
-          <div>
-            <h3>{{ criterion.title }}</h3>
-            <span>{{ criterion.weight }} {{ isArabic ? 'درجة المعيار الكلية' : 'criterion total score' }}</span>
-          </div>
-          <div class="criterion-actions">
-            <label class="full-check" [class.full]="isCriterionPerfectForAll(criterion)">
-              <input type="checkbox" [checked]="isCriterionPerfectForAll(criterion)" [disabled]="!canEdit()"
-                (change)="markCriterionFullForAll(criterion, $any($event.target).checked)">
-              <span>{{ isArabic ? 'تعبئة كاملة 100%' : 'Fill 100%' }}</span>
-            </label>
-            <strong>{{ criterionEarnedScore(criterion) }} / {{ criterionMaxScore(criterion) }}</strong>
-          </div>
-        </div>
-
-        @if (criterion.items.length) {
-        <div class="score-items rubric-options">
-          @for (item of sortedItems(criterion); track item.id; let index = $index) {
-          <button class="score-item rubric-option" type="button" [class.completed]="isLevelSelected(criterion, item.id)"
-            [disabled]="!canEdit()" (click)="selectCriterionLevel(criterion, item)">
-            <div class="item-copy">
-              <strong>{{ item.title }}</strong>
-              <span>{{ item.description || (isArabic ? 'لا يوجد وصف لهذا البند.' : 'No description for this item.')
-                }}</span>
-            </div>
-            <span class="status-pill">{{ item.maxScore }} / {{ criterionMaxScore(criterion) }}</span>
-          </button>
-          }
-        </div>
-
-        @if (selectedCriterionItem(criterion); as selectedItem) {
-        <label class="notes-field criterion-notes">
-          <span>{{ isArabic ? 'ملاحظات للطالب المحدد' : 'Notes for selected student' }}</span>
-          <input type="text" [value]="scoreNotes(selectedItem.id)" [disabled]="!canEdit()"
-            [placeholder]="isArabic ? 'ملاحظة اختيارية' : 'Optional note'"
-            (input)="setNotes(selectedItem.id, $any($event.target).value)">
-        </label>
-        }
-        } @else {
-        <div class="empty-state compact">
-          <span>{{ isArabic ? 'لا توجد بنود داخل هذا المعيار.' : 'No items in this criterion.' }}</span>
-        </div>
-        }
-      </section>
-      }
-    </article>
-    }
-
-    <div class="form-footer panel">
-      <div>
-        <strong>{{ isArabic ? 'حفظ تقييم الطالب' : 'Save student evaluation' }}</strong>
-        <span>{{ isArabic ? 'يتم حفظ اختيار كل معيار مباشرة في قاعدة البيانات للطالب المحدد.' : 'Each criterion choice
-          is saved directly to the database for the selected student.' }}</span>
-      </div>
-      <button class="primary-button" type="submit" [disabled]="!canEdit()">{{ isArabic ? 'تأكيد الحفظ' : 'Confirm save'
-        }}</button>
-    </div>
-
-    @if (savedMessage) {
-    <p class="form-message success">{{ savedMessage }}</p>
-    }
-
-    <!-- General Feedbacks Block -->
-    <article class="panel feedbacks-panel">
-      <header>
-        <h2>{{ isArabic ? 'ملاحظات التقييم العامة' : 'General Evaluation Notes' }}</h2>
-        <p>{{ isArabic ? 'يمكنك إضافة ملاحظات عامة حول هذا المشروع هنا (صالحة لجميع الأعضاء والمقيمين).' : 'You can add
-          general notes about this project here (visible to all members and evaluators).' }}</p>
-      </header>
-
-      <div class="feedbacks-list">
-        @for (feedback of feedbacks(); track feedback.id) {
-        <div class="feedback-item">
-          <div class="feedback-meta">
-            <strong>{{ feedback.user?.full_name || 'Admin' }}</strong>
-            <small>{{ feedback.created_at | date:'short' }}</small>
-          </div>
-          <p>{{ feedback.content }}</p>
-          <button type="button" class="delete-btn outline-danger" (click)="deleteFeedback(feedback.id)">
-            {{ isArabic ? 'حذف' : 'Delete' }}
-          </button>
-        </div>
-        } @empty {
-        <div class="empty-state compact">
-          <span>{{ isArabic ? 'لا توجد ملاحظات عامة سابقة.' : 'No previous general feedbacks.' }}</span>
-        </div>
-        }
-      </div>
-
-      <div class="add-feedback-form">
-        <textarea [(ngModel)]="newFeedbackContent" name="newFeedbackContent" class="form-textarea"
-          [placeholder]="isArabic ? 'اكتب ملاحظتك هنا...' : 'Write your note here...'" rows="3"></textarea>
-        <div class="feedback-actions">
-          <button type="button" class="primary-button" (click)="addGeneralFeedback()">
-            {{ isArabic ? 'إضافة ملاحظة' : 'Add Note' }}
-          </button>
-          @if (feedbackMessage) {
-          <span class="form-message success">{{ feedbackMessage }}</span>
-          }
-        </div>
-      </div>
-    </article>
-  </form>
-  } @else if (!groups().length || !allCriteria().length) {
-  <div class="empty-state">
-    <strong>{{ isArabic ? 'لا توجد معايير تقييم جاهزة' : 'No evaluation criteria yet' }}</strong>
-    <span>{{ isArabic ? 'الأدمن يجب أن يضيف مجموعات التقييم والمعايير والبنود الأربعة أولًا من صفحة إعداد التقييمات.' :
-      'The admin must add groups, criteria, and the four items first from Evaluation Setup.' }}</span>
-  </div>
-  }
-  } @else {
-  <div class="empty-state">
-    <strong>{{ isArabic ? 'المشروع غير موجود' : 'Project not found' }}</strong>
-    <span>{{ isArabic ? 'ارجعي إلى صفحة نماذج التقييم واختاري مشروعًا موجودًا.' : 'Return to evaluation forms and choose
-      an existing project.' }}</span>
-  </div>
-  }
-</section>
-
-<!-- لوحة عرض النتيجة النهائية المنبثقة -->
-@if (showFinalReportModal()) {
-<div class="modal-overlay" (click)="showFinalReportModal.set(false)">
-  <div class="modal-content report-modal" (click)="$event.stopPropagation()">
-    <header class="modal-header">
-      <h2>{{ isArabic ? 'النتيجة النهائية الرسمية' : 'Official Final Result' }}</h2>
-      <button type="button" class="close-button" (click)="showFinalReportModal.set(false)"
-        aria-label="Close">&times;</button>
-    </header>
-
-    <div class="modal-body">
-      @if (finalReport(); as report) {
-      <div class="report-meta">
-        <strong>{{ isArabic ? 'المشروع:' : 'Project:' }}</strong> {{ report.project_title }} <br />
-        <strong>{{ isArabic ? 'عدد المقيّمين:' : 'Evaluators Count:' }}</strong> {{ report.evaluators_count }}
-      </div>
-
-      <table class="data-table final-report-table">
-        <thead>
-          <tr>
-            <th>{{ isArabic ? 'اسم الطالب' : 'Student Name' }}</th>
-            <th>{{ isArabic ? 'تفاصيل المعايير' : 'Criteria Details' }}</th>
-            <th>{{ isArabic ? 'الدرجة النهائية (متوسط)' : 'Final Score (Average)' }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (student of report.students; track student.student_id) {
-          <tr>
-            <td><strong>{{ student.student_name }}</strong></td>
-            <td>
-              <ul class="criteria-list">
-                @for (score of student.scores; track score.criteria) {
-                <li>
-                  <em>{{ score.criteria }}</em>: {{ score.weighted_score }} / {{ score.weight }}
-                </li>
-                }
-              </ul>
-            </td>
-            <td><span class="status-pill">{{ student.final_score }} %</span></td>
-          </tr>
-          }
-        </tbody>
-      </table>
-
-      <div class="report-actions"
-        style="margin-top: 1.5rem; text-align: end; display: flex; justify-content: flex-end; gap: 10px;">
-        @if (project()) {
-        <a class="secondary-button" style="text-decoration: none;"
-          href="http://127.0.0.1:8000/api/projects/{{ project()?.id }}/export/excel" target="_blank" download>
-          📊 {{ isArabic ? 'تصدير إكسيل' : 'Export Excel' }}
-        </a>
-        <a class="secondary-button" style="text-decoration: none;"
-          href="http://127.0.0.1:8000/api/projects/{{ project()?.id }}/export/pdf" target="_blank" download>
-          📄 {{ isArabic ? 'تصدير PDF' : 'Export PDF' }}
-        </a>
-        }
-        <button type="button" class="primary-button" onclick="window.print()">
-          🖨️ {{ isArabic ? 'طباعة التقرير' : 'Print Report' }}
-        </button>
-      </div>
-      } @else {
-      <p>{{ isArabic ? 'جاري التحميل...' : 'Loading...' }}</p>
-      }
-    </div>
-  </div>
-</div>
-}
+<section class="management-page result-details-page">
+
+  <header class="management-header">
+
+    <div>
+
+      <a class="back-link" routerLink="/project-evaluation-forms">{{ isArabic ? 'العودة إلى نماذج التقييم' : 'Back to
+
+        evaluation forms' }}</a>
+
+      <h1 class="page-title">{{ isArabic ? 'نموذج تقييم المشروع' : 'Project Evaluation Form' }}</h1>
+
+      <p class="page-subtitle">
+
+        {{ isArabic ? 'اختر المشروع ثم الطالب، وبعدها حدد مستوى التقييم المناسب لكل معيار من البنود التي أنشأها
+
+        الأدمن.' : 'Choose the project and student, then select the suitable rubric level for each admin-defined
+
+        criterion.' }}
+
+      </p>
+
+    </div>
+
+    <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+
+      <span class="status-pill">{{ resultPercent() }}%</span>
+
+
+
+      @if (project()?.is_locked) {
+
+      <span class="status-pill" style="background: var(--surface-200, #eee); color: var(--text-muted, #666);">
+
+        🔒 {{ isArabic ? 'مكتمل (معتمد)' : 'Completed (Locked)' }}
+
+      </span>
+
+      }
+
+
+
+      @if (!project()?.is_locked || isCommitteeHead()) {
+
+      <button type="button" class="primary-button" (click)="toggleLock()">
+
+        @if (project()?.is_locked) {
+
+        🔓 {{ isArabic ? 'فك اعتماد التقييم' : 'Unlock Evaluation' }}
+
+        } @else {
+
+        🔒 {{ isArabic ? 'اعتماد وإغلاق التقييم' : 'Finalize & Lock Evaluation' }}
+
+        }
+
+      </button>
+
+      }
+
+
+
+      @if (project()?.is_locked) {
+
+      <button type="button" class="secondary-button" (click)="loadFinalReport()">
+
+        📄 {{ isArabic ? 'عرض النتيجة النهائية' : 'View Final Report' }}
+
+      </button>
+
+      }
+
+    </div>
+
+  </header>
+
+
+
+  @if (project()) {
+
+  @if (hasDiscrepancy() && !project()?.is_locked) {
+
+  <div class="alert-warning panel"
+
+    style="background: rgba(255, 193, 7, 0.15); border: 1px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; align-items: flex-start; gap: 15px;">
+
+    <div style="font-size: 2rem; color: #d39e00;">⚠️</div>
+
+    <div>
+
+      <h3 style="margin: 0 0 5px; color: #856404;">{{ isArabic ? 'تنبيه: تباين كبير في تقييمات اللجنة!' : 'Alert: Large
+
+        Discrepancy in Committee Evaluations!' }}</h3>
+
+      <p style="margin: 0; color: #856404;">{{ isArabic ? 'الفرق بين درجات بعض أعضاء اللجنة لنفس الطالب في هذا المشروع
+
+        ضخم جداً. يوصى بمراجعة وتوحيد التقييمات عبر الملاحظات العامة قبل اعتماد التقييم وإغلاقه نهائياً.' : 'The
+
+        difference between the scores given by some committee members for the same student in this project is massive.
+
+        It is recommended to review and unify evaluations via General Feedbacks before finalizing.' }}</p>
+
+    </div>
+
+  </div>
+
+  }
+
+
+
+  <article class="panel evaluation-toolbar">
+
+    <label class="project-selector">
+
+      <span>{{ isArabic ? 'المشروع المحدد' : 'Selected project' }}</span>
+
+      <select [value]="projectId()" (change)="goToProject($any($event.target).value)">
+
+        @for (item of projects(); track item.id) {
+
+        <option [value]="item.id">{{ item.title }}</option>
+
+        }
+
+      </select>
+
+    </label>
+
+
+
+    <div class="toolbar-stats">
+
+      <div>
+
+        <span>{{ isArabic ? 'الطالب الحالي' : 'Current student' }}</span>
+
+        <strong>{{ activeStudent()?.fullName || (isArabic ? 'غير محدد' : 'Not selected') }}</strong>
+
+      </div>
+
+      <div>
+
+        <span>{{ isArabic ? 'درجة الطالب' : 'Student score' }}</span>
+
+        <strong>{{ earnedScore() }} / {{ totalMaxScore() }}</strong>
+
+      </div>
+
+      <div>
+
+        <span>{{ isArabic ? 'المعايير المكتملة' : 'Completed criteria' }}</span>
+
+        <strong>{{ completedItems() }} / {{ allCriteria().length }}</strong>
+
+      </div>
+
+    </div>
+
+  </article>
+
+
+
+  @if (projectStudents().length) {
+
+  <article class="panel student-strip">
+
+    <div>
+
+      <span>{{ isArabic ? 'طلاب المشروع' : 'Project students' }}</span>
+
+      <strong>{{ projectStudents().length }} {{ isArabic ? 'طلاب' : 'students' }}</strong>
+
+    </div>
+
+    <div class="student-tabs">
+
+      @for (student of projectStudents(); track student.id) {
+
+      <button type="button" [class.active]="student.id === activeStudentId()" (click)="selectStudent(student.id)">
+
+        <strong>{{ student.fullName }}</strong>
+
+        <small>{{ student.academicNumber }}</small>
+
+      </button>
+
+      }
+
+    </div>
+
+  </article>
+
+  } @else {
+
+  <div class="empty-state">
+
+    <strong>{{ isArabic ? 'لا يوجد طلاب مرتبطون بهذا المشروع' : 'No students are linked to this project' }}</strong>
+
+    <span>{{ isArabic ? 'اربطي الطلاب بالمشروع من صفحة أعضاء المشاريع قبل إدخال التقييم.' : 'Link students to the
+
+      project from Project Members before scoring.' }}</span>
+
+  </div>
+
+  }
+
+
+
+  <article class="panel result-summary-panel">
+
+    <div>
+
+      <span>{{ isArabic ? 'نتيجة الطالب المحدد' : 'Selected student result' }}</span>
+
+      <strong>{{ resultPercent() }}%</strong>
+
+    </div>
+
+    <div class="score-bar" aria-hidden="true">
+
+      <span [style.width.%]="resultPercent()"></span>
+
+    </div>
+
+  </article>
+
+
+
+  @if (projectStudents().length && groups().length && allCriteria().length) {
+
+  <form class="evaluation-form" (ngSubmit)="saveEvaluation()">
+
+    <article class="panel evaluation-sheet" [attr.dir]="isArabic ? 'rtl' : 'ltr'">
+
+      <div class="evaluation-sheet-scroll">
+
+        <table class="evaluation-sheet-table">
+
+          <thead>
+
+            <tr>
+
+              <th class="sheet-label-cell">{{ isArabic ? 'البند' : 'Item' }}</th>
+
+              @for (student of projectStudents(); track student.id) {
+
+              <th class="student-heading">
+
+                <button type="button" [class.active]="student.id === activeStudentId()"
+
+                  (click)="selectStudent(student.id)">
+
+                  {{ student.fullName }}
+
+                </button>
+
+              </th>
+
+              }
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr class="sheet-total-row">
+
+              <th>{{ isArabic ? 'الدرجة النهائية' : 'Final score' }}</th>
+
+              @for (student of projectStudents(); track student.id) {
+
+              <td>{{ studentTotalScore(student.id) }} / {{ totalMaxScore() }}</td>
+
+              }
+
+            </tr>
+
+
+
+            @for (group of groups(); track group.id) {
+
+            <tr class="sheet-group-row">
+
+              <th>
+
+                <span>{{ group.title }}</span>
+
+              </th>
+
+              @for (student of projectStudents(); track student.id) {
+
+              <td>{{ studentGroupScore(group, student.id) }} / {{ groupMaxScore(group) }}</td>
+
+              }
+
+            </tr>
+
+
+
+            @for (criterion of group.criteria; track criterion.id) {
+
+            <tr class="sheet-criterion-row">
+
+              <th>
+
+                <span>{{ criterion.title }}</span>
+
+                <label class="sheet-full-check" [class.full]="isCriterionPerfectForAll(criterion)">
+
+                  <input type="checkbox" [checked]="isCriterionPerfectForAll(criterion)" [disabled]="!canEdit()"
+
+                    (change)="markCriterionFullForAll(criterion, $any($event.target).checked)">
+
+                  <small>{{ isArabic ? 'تعبئة كاملة 100%' : 'Fill 100%' }}</small>
+
+                </label>
+
+              </th>
+
+              @for (student of projectStudents(); track student.id) {
+
+              <td>{{ studentCriterionScore(criterion, student.id) }} / {{ criterionMaxScore(criterion) }}</td>
+
+              }
+
+            </tr>
+
+
+
+            @for (item of sortedItems(criterion); track item.id) {
+
+            <tr class="sheet-rubric-row">
+
+              <th>
+
+                <span>{{ item.title }}</span>
+
+                <small>{{ isArabic ? 'مقياس المعيار' : 'Criterion scale' }}</small>
+
+              </th>
+
+              @for (student of projectStudents(); track student.id) {
+
+              <td>
+
+                <button class="rubric-cell-button" type="button" [disabled]="!canEdit()"
+
+                  [class.selected]="isLevelSelectedForStudent(criterion, item.id, student.id)"
+
+                  (click)="selectCriterionLevelForStudent(criterion, item, student.id)">
+
+                  <span>{{ item.title }}</span>
+
+                  <small>{{ rubricScoreLabel(item, criterion) }}</small>
+
+                </button>
+
+              </td>
+
+              }
+
+            </tr>
+
+            }
+
+            }
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+
+
+    @for (group of groups(); track group.id) {
+
+    <article class="panel result-group">
+
+      <header>
+
+        <div>
+
+          <span>{{ isArabic ? 'مجموعة تقييم' : 'Evaluation group' }}</span>
+
+          <h2>{{ group.title }}</h2>
+
+          @if (group.description) {
+
+          <p>{{ group.description }}</p>
+
+          }
+
+        </div>
+
+        <div class="group-score">
+
+          <strong>{{ groupEarnedScore(group) }} / {{ groupMaxScore(group) }}</strong>
+
+          <small>{{ group.weight }}% {{ isArabic ? 'وزن' : 'weight' }}</small>
+
+        </div>
+
+      </header>
+
+
+
+      <div class="score-bar group-bar" aria-hidden="true">
+
+        <span [style.width.%]="groupPercent(group)"></span>
+
+      </div>
+
+
+
+      @for (criterion of group.criteria; track criterion.id) {
+
+      <section class="criterion-section">
+
+        <div class="criterion-title">
+
+          <div>
+
+            <h3>{{ criterion.title }}</h3>
+
+            <span>{{ criterion.weight }} {{ isArabic ? 'درجة المعيار الكلية' : 'criterion total score' }}</span>
+
+          </div>
+
+          <div class="criterion-actions">
+
+            <label class="full-check" [class.full]="isCriterionPerfectForAll(criterion)">
+
+              <input type="checkbox" [checked]="isCriterionPerfectForAll(criterion)" [disabled]="!canEdit()"
+
+                (change)="markCriterionFullForAll(criterion, $any($event.target).checked)">
+
+              <span>{{ isArabic ? 'تعبئة كاملة 100%' : 'Fill 100%' }}</span>
+
+            </label>
+
+            <strong>{{ criterionEarnedScore(criterion) }} / {{ criterionMaxScore(criterion) }}</strong>
+
+          </div>
+
+        </div>
+
+
+
+        @if (criterion.items.length) {
+
+        <div class="score-items rubric-options">
+
+          @for (item of sortedItems(criterion); track item.id; let index = $index) {
+
+          <button class="score-item rubric-option" type="button" [class.completed]="isLevelSelected(criterion, item.id)"
+
+            [disabled]="!canEdit()" (click)="selectCriterionLevel(criterion, item)">
+
+            <div class="item-copy">
+
+              <strong>{{ item.title }}</strong>
+
+              <span>{{ item.description || (isArabic ? 'لا يوجد وصف لهذا البند.' : 'No description for this item.')
+
+                }}</span>
+
+            </div>
+
+            <span class="status-pill">{{ item.maxScore }} / {{ criterionMaxScore(criterion) }}</span>
+
+          </button>
+
+          }
+
+        </div>
+
+
+
+        @if (selectedCriterionItem(criterion); as selectedItem) {
+
+        <label class="notes-field criterion-notes">
+
+          <span>{{ isArabic ? 'ملاحظات للطالب المحدد' : 'Notes for selected student' }}</span>
+
+          <input type="text" [value]="scoreNotes(selectedItem.id)" [disabled]="!canEdit()"
+
+            [placeholder]="isArabic ? 'ملاحظة اختيارية' : 'Optional note'"
+
+            (input)="setNotes(selectedItem.id, $any($event.target).value)">
+
+        </label>
+
+        }
+
+        } @else {
+
+        <div class="empty-state compact">
+
+          <span>{{ isArabic ? 'لا توجد بنود داخل هذا المعيار.' : 'No items in this criterion.' }}</span>
+
+        </div>
+
+        }
+
+      </section>
+
+      }
+
+    </article>
+
+    }
+
+
+
+    <div class="form-footer panel">
+
+      <div>
+
+        <strong>{{ isArabic ? 'حفظ تقييم الطالب' : 'Save student evaluation' }}</strong>
+
+        <span>{{ isArabic ? 'يتم حفظ اختيار كل معيار مباشرة في قاعدة البيانات للطالب المحدد.' : 'Each criterion choice
+
+          is saved directly to the database for the selected student.' }}</span>
+
+      </div>
+
+      <button class="primary-button" type="submit" [disabled]="!canEdit()">{{ isArabic ? 'تأكيد الحفظ' : 'Confirm save'
+
+        }}</button>
+
+    </div>
+
+
+
+    @if (savedMessage) {
+
+    <p class="form-message success">{{ savedMessage }}</p>
+
+    }
+
+
+
+    <!-- General Feedbacks Block -->
+
+    <article class="panel feedbacks-panel">
+
+      <header>
+
+        <h2>{{ isArabic ? 'ملاحظات التقييم العامة' : 'General Evaluation Notes' }}</h2>
+
+        <p>{{ isArabic ? 'يمكنك إضافة ملاحظات عامة حول هذا المشروع هنا (صالحة لجميع الأعضاء والمقيمين).' : 'You can add
+
+          general notes about this project here (visible to all members and evaluators).' }}</p>
+
+      </header>
+
+
+
+      <div class="feedbacks-list">
+
+        @for (feedback of feedbacks(); track feedback.id) {
+
+        <div class="feedback-item">
+
+          <div class="feedback-meta">
+
+            <strong>{{ feedback.user?.full_name || 'Admin' }}</strong>
+
+            <small>{{ feedback.created_at | date:'short' }}</small>
+
+          </div>
+
+          <p>{{ feedback.content }}</p>
+
+          <button type="button" class="delete-btn outline-danger" (click)="deleteFeedback(feedback.id)">
+
+            {{ isArabic ? 'حذف' : 'Delete' }}
+
+          </button>
+
+        </div>
+
+        } @empty {
+
+        <div class="empty-state compact">
+
+          <span>{{ isArabic ? 'لا توجد ملاحظات عامة سابقة.' : 'No previous general feedbacks.' }}</span>
+
+        </div>
+
+        }
+
+      </div>
+
+
+
+      <div class="add-feedback-form">
+
+        <textarea [(ngModel)]="newFeedbackContent" name="newFeedbackContent" class="form-textarea"
+
+          [placeholder]="isArabic ? 'اكتب ملاحظتك هنا...' : 'Write your note here...'" rows="3"></textarea>
+
+        <div class="feedback-actions">
+
+          <button type="button" class="primary-button" (click)="addGeneralFeedback()">
+
+            {{ isArabic ? 'إضافة ملاحظة' : 'Add Note' }}
+
+          </button>
+
+          @if (feedbackMessage) {
+
+          <span class="form-message success">{{ feedbackMessage }}</span>
+
+          }
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </form>
+
+  } @else if (!groups().length || !allCriteria().length) {
+
+  <div class="empty-state">
+
+    <strong>{{ isArabic ? 'لا توجد معايير تقييم جاهزة' : 'No evaluation criteria yet' }}</strong>
+
+    <span>{{ isArabic ? 'الأدمن يجب أن يضيف مجموعات التقييم والمعايير والبنود الأربعة أولًا من صفحة إعداد التقييمات.' :
+
+      'The admin must add groups, criteria, and the four items first from Evaluation Setup.' }}</span>
+
+  </div>
+
+  }
+
+  } @else {
+
+  <div class="empty-state">
+
+    <strong>{{ isArabic ? 'المشروع غير موجود' : 'Project not found' }}</strong>
+
+    <span>{{ isArabic ? 'ارجعي إلى صفحة نماذج التقييم واختاري مشروعًا موجودًا.' : 'Return to evaluation forms and choose
+
+      an existing project.' }}</span>
+
+  </div>
+
+  }
+
+</section>
+
+
+
+<!-- لوحة عرض النتيجة النهائية المنبثقة -->
+
+@if (showFinalReportModal()) {
+
+<div class="modal-overlay" (click)="showFinalReportModal.set(false)">
+
+  <div class="modal-content report-modal" (click)="$event.stopPropagation()">
+
+    <header class="modal-header">
+
+      <h2>{{ isArabic ? 'النتيجة النهائية الرسمية' : 'Official Final Result' }}</h2>
+
+      <button type="button" class="close-button" (click)="showFinalReportModal.set(false)"
+
+        aria-label="Close">&times;</button>
+
+    </header>
+
+
+
+    <div class="modal-body">
+
+      @if (finalReport(); as report) {
+
+      <div class="report-meta">
+
+        <strong>{{ isArabic ? 'المشروع:' : 'Project:' }}</strong> {{ report.project_title }} <br />
+
+        <strong>{{ isArabic ? 'عدد المقيّمين:' : 'Evaluators Count:' }}</strong> {{ report.evaluators_count }}
+
+      </div>
+
+
+
+      <table class="data-table final-report-table">
+
+        <thead>
+
+          <tr>
+
+            <th>{{ isArabic ? 'اسم الطالب' : 'Student Name' }}</th>
+
+            <th>{{ isArabic ? 'تفاصيل المعايير' : 'Criteria Details' }}</th>
+
+            <th>{{ isArabic ? 'الدرجة النهائية (متوسط)' : 'Final Score (Average)' }}</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          @for (student of report.students; track student.student_id) {
+
+          <tr>
+
+            <td><strong>{{ student.student_name }}</strong></td>
+
+            <td>
+
+              <ul class="criteria-list">
+
+                @for (score of student.scores; track score.criteria) {
+
+                <li>
+
+                  <em>{{ score.criteria }}</em>: {{ score.weighted_score }} / {{ score.weight }}
+
+                </li>
+
+                }
+
+              </ul>
+
+            </td>
+
+            <td><span class="status-pill">{{ student.final_score }} %</span></td>
+
+          </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+
+
+      <div class="report-actions"
+
+        style="margin-top: 1.5rem; text-align: end; display: flex; justify-content: flex-end; gap: 10px;">
+
+        @if (project()) {
+
+        <a class="secondary-button" style="text-decoration: none;"
+
+          href="http://127.0.0.1:8000/api/projects/{{ project()?.id }}/export/excel" target="_blank" download>
+
+          📊 {{ isArabic ? 'تصدير إكسيل' : 'Export Excel' }}
+
+        </a>
+
+        <a class="secondary-button" style="text-decoration: none;"
+
+          href="http://127.0.0.1:8000/api/projects/{{ project()?.id }}/export/pdf" target="_blank" download>
+
+          📄 {{ isArabic ? 'تصدير PDF' : 'Export PDF' }}
+
+        </a>
+
+        }
+
+        <button type="button" class="primary-button" onclick="window.print()">
+
+          🖨️ {{ isArabic ? 'طباعة التقرير' : 'Print Report' }}
+
+        </button>
+
+      </div>
+
+      } @else {
+
+      <p>{{ isArabic ? 'جاري التحميل...' : 'Loading...' }}</p>
+
+      }
+
+    </div>
+
+  </div>
+
+</div>
+
+}
+

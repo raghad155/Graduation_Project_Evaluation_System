@@ -113,7 +113,7 @@ export class LoginComponent {
     }
 
     if (this.errorMessage.includes('Cannot connect')) {
-      return 'لا يمكن الاتصال بخادم Laravel. تأكدي أن الخادم يعمل.';
+      return 'لا يمكن الاتصال بخادم Laravel. تأكد أن الخادم يعمل.';
     }
 
     if (this.errorMessage.includes('Invalid username') || this.errorMessage.includes('password')) {

@@ -73,7 +73,7 @@ export class ProjectMembersComponent {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.showMessage(this.isArabic ? 'اختاري المشروع والطالب قبل الإضافة.' : 'Select a project and student before adding.', 'error');
+      this.showMessage(this.isArabic ? 'اختر المشروع والطالب قبل الإضافة.' : 'Select a project and student before adding.', 'error');
       return;
     }
 

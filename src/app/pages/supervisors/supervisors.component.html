@@ -36,7 +36,7 @@
         <label class="field">
           <span>{{ isArabic ? 'القسم' : 'Department' }}</span>
           <select formControlName="department">
-            <option value="">{{ isArabic ? 'اختاري القسم' : 'Select department' }}</option>
+            <option value="">{{ isArabic ? 'اختر القسم' : 'Select department' }}</option>
             @for (department of departments(); track department.value) {
             <option [value]="department.value">{{ isArabic ? department.labelAr : department.labelEn }}</option>
             }
@@ -110,7 +110,7 @@
       } @else {
       <div class="empty-state">
         <strong>{{ isArabic ? 'لا يوجد مشرفون' : 'No supervisors found' }}</strong>
-        <span>{{ isArabic ? 'أضيفي مشرفًا من النموذج أو غيّري البحث.' : 'Add a supervisor from the form or change your
+        <span>{{ isArabic ? 'أضف مشرفًا من النموذج أو غيّري البحث.' : 'Add a supervisor from the form or change your
           search.' }}</span>
       </div>
       }

@@ -65,7 +65,7 @@ export class StudentImportComponent {
 
   upload(): void {
     if (!this.selectedFile) {
-      this.fileError = this.isArabic ? 'اختاري ملفًا قبل الرفع.' : 'Select a file before upload.';
+      this.fileError = this.isArabic ? 'اختر ملفًا قبل الرفع.' : 'Select a file before upload.';
       return;
     }
 
@@ -180,7 +180,7 @@ export class StudentImportComponent {
     }
 
     if (detail.includes('Laravel server')) {
-      return 'تأكدي من تشغيل خادم Laravel وأن صيغة الملف صحيحة.';
+      return 'تأكد من تشغيل خادم Laravel وأن صيغة الملف صحيحة.';
     }
 
     return detail;
