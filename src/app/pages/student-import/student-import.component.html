@@ -12,7 +12,7 @@
     <article class="form-panel panel">
       <h2>{{ isArabic ? 'رفع الملف' : 'Upload File' }}</h2>
 
-      <div class="import-type-selector">
+      <div class="import-type-switch">
         <button class="secondary-button" type="button" [class.active]="importType === 'students'"
           (click)="setImportType('students')">{{ isArabic ? 'الطلاب' : 'Students' }}</button>
         <button class="secondary-button" type="button" [class.active]="importType === 'supervisors'"
